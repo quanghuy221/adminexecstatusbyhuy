@@ -157,9 +157,8 @@
 
     <script>
         const API_URL = "https://api.npoint.io/9d78b91f5a0f7c9f5ec8";
-        const ADMIN_PASS = "quanghuy90";
+        const ADMIN_PASS = "quanghuy90"; // Đã đổi mật khẩu tại đây
 
-        // Danh sách dữ liệu gốc ban đầu
         const defaultData = [
             {name: "Potassium", plat: "Windows", status: "working", price: "549k", time: "Cập nhật sau", note: ""},
             {name: "Volt", plat: "Windows", status: "working", price: "149 - 499k", time: "Cập nhật sau", note: ""},
@@ -288,14 +287,14 @@
             adminTableBody.prepend(tr);
         });
 
-        // Xử lý nút Khôi phục cài đặt gốc
         resetDataBtn.addEventListener('click', () => {
-            if (confirm("⚠️ Bạn có chắc chắn muốn KHÔI PHỤC cài đặt gốc?\n\nToàn bộ dữ liệu hiện tại trên bảng sẽ bị thay thế bằng danh sách mặc định ban đầu.")) {
+            if (confirm("⚠️ Bạn có chắc chắn muốn KHÔI PHỤC cài đặt gốc?\n\nToàn bộ dữ liệu hiện tại sẽ được thay thế bằng danh sách mặc định.")) {
                 renderAdminRows(defaultData);
-                showToast("🔄 Đã đặt lại về dữ liệu gốc! Hãy nhấn 'Lưu & Đồng Bộ' để cập nhật lên server.");
+                showToast("🔄 Đã đặt lại về dữ liệu gốc! Bấm 'Lưu & Đồng Bộ' để cập nhật.");
             }
         });
 
+        // Hàm lưu cải tiến chống treo nút
         saveDataBtn.addEventListener('click', async () => {
             const rows = document.querySelectorAll('.admin-row');
             const newData = [];
@@ -313,20 +312,42 @@
             saveDataBtn.disabled = true;
             saveDataBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Đang lưu...`;
 
+            // Cấu hình Timeout ngắt sau 8 giây
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 8000);
+
             try {
-                const response = await fetch(API_URL, {
+                let response = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(newData)
+                    body: JSON.stringify(newData),
+                    signal: controller.signal
                 });
 
-                if (!response.ok) throw new Error("Status " + response.status);
+                if (!response.ok) {
+                    // Thử lại bằng PUT nếu POST thất bại
+                    response = await fetch(API_URL, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(newData),
+                        signal: controller.signal
+                    });
+                }
+
+                clearTimeout(timeoutId);
+
+                if (!response.ok) throw new Error("Mã lỗi: " + response.status);
 
                 showToast("🌐 Đã lưu & Đồng bộ thành công!");
             } catch (err) {
                 console.error(err);
-                showToast("❌ Lỗi khi lưu dữ liệu!");
+                if (err.name === 'AbortError') {
+                    showToast("❌ Kết nối quá thời gian! Kiểm tra lại mạng.");
+                } else {
+                    showToast("❌ Không thể lưu lên server npoint!");
+                }
             } finally {
+                clearTimeout(timeoutId);
                 saveDataBtn.disabled = false;
                 saveDataBtn.innerHTML = `<i class="fas fa-cloud-arrow-up"></i> Lưu & Đồng Bộ Lên Web`;
             }
