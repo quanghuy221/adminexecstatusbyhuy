@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Portal - Executors Status</title>
+    <title>Admin Huy Dep Trai</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -28,6 +28,10 @@
             justify-content: center;
             align-items: center;
             padding: 20px;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(139, 92, 246, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 85% 85%, rgba(6, 182, 212, 0.1) 0%, transparent 45%);
+            background-attachment: fixed;
         }
 
         .admin-card {
@@ -38,6 +42,13 @@
             width: 100%;
             max-width: 1100px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            backdrop-filter: blur(10px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .auth-container { text-align: center; padding: 40px 10px; }
@@ -53,6 +64,7 @@
             font-family: 'Outfit', sans-serif;
             font-size: 0.9rem;
             width: 100%;
+            transition: border-color 0.2s ease;
         }
 
         input:focus, select:focus { border-color: var(--accent); }
@@ -63,16 +75,18 @@
             cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
             transition: all 0.2s ease;
         }
-        .btn:hover { opacity: 0.9; }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn:active { transform: translateY(0); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
         .btn-secondary { background: rgba(255, 255, 255, 0.1); color: var(--text-main); }
         .btn-danger { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+        .btn-danger:hover { background: rgba(239, 68, 68, 0.35); }
 
         .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
 
-        .admin-table-container { overflow-x: auto; max-height: 60vh; margin-bottom: 20px; }
+        .admin-table-container { overflow-x: auto; max-height: 60vh; margin-bottom: 20px; border-radius: 12px; border: 1px solid var(--border); }
         table { width: 100%; border-collapse: collapse; min-width: 800px; }
-        th { color: var(--text-sub); font-size: 0.75rem; text-transform: uppercase; padding: 10px; border-bottom: 1px solid var(--border); text-align: left; }
+        th { color: var(--text-sub); font-size: 0.75rem; text-transform: uppercase; padding: 12px 10px; border-bottom: 1px solid var(--border); text-align: left; background: rgba(15, 23, 42, 0.95); position: sticky; top: 0; z-index: 10; }
         td { padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.03); }
 
         .admin-actions { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
@@ -81,9 +95,14 @@
             position: fixed; bottom: 20px; right: 20px; background: rgba(16, 185, 129, 0.95);
             color: white; padding: 14px 24px; border-radius: 12px; font-weight: 600;
             display: flex; align-items: center; gap: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            transform: translateY(100px); opacity: 0; transition: all 0.3s ease; z-index: 10000;
+            transform: translateY(100px); opacity: 0; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 10000;
         }
         .toast.show { transform: translateY(0); opacity: 1; }
+
+        @media (max-width: 768px) {
+            .admin-actions { flex-direction: column; align-items: stretch; }
+            .admin-actions > div { display: flex; flex-direction: column; gap: 8px; }
+        }
     </style>
 </head>
 <body>
@@ -127,8 +146,9 @@
             </div>
 
             <div class="admin-actions">
-                <div style="display: flex; gap: 8px;">
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                     <button class="btn btn-secondary" id="addRowBtn"><i class="fas fa-plus"></i> Thêm Hàng Mới</button>
+                    <button class="btn btn-danger" id="resetDataBtn"><i class="fas fa-rotate-left"></i> Khôi Phục Cài Đặt Gốc</button>
                 </div>
                 <button class="btn" id="saveDataBtn"><i class="fas fa-cloud-arrow-up"></i> Lưu & Đồng Bộ Lên Web</button>
             </div>
@@ -137,7 +157,34 @@
 
     <script>
         const API_URL = "https://api.npoint.io/9d78b91f5a0f7c9f5ec8";
-        const ADMIN_PASS = "daoquanghuy90";
+        const ADMIN_PASS = "quanghuy90";
+
+        // Danh sách dữ liệu gốc ban đầu
+        const defaultData = [
+            {name: "Potassium", plat: "Windows", status: "working", price: "549k", time: "Cập nhật sau", note: ""},
+            {name: "Volt", plat: "Windows", status: "working", price: "149 - 499k", time: "Cập nhật sau", note: ""},
+            {name: "Wave", plat: "Windows", status: "working", price: "139 - 489k", time: "Cập nhật sau", note: ""},
+            {name: "Ronix", plat: "Windows", status: "outdated", price: "Free", time: "Cập nhật sau", note: ""},
+            {name: "Synapse Z", plat: "Windows", status: "outdated", price: "none", time: "Cập nhật sau", note: ""},
+            {name: "Seliware", plat: "Windows", status: "outdated", price: "none", time: "Cập nhật sau", note: ""},
+            {name: "Madium V2", plat: "Windows", status: "working", price: "Free", time: "Cập nhật sau", note: ""},
+            {name: "Cosmic", plat: "Windows", status: "unstable", price: "none", time: "Cập nhật sau", note: ""},
+            {name: "Velocity", plat: "Windows", status: "working", price: "Free", time: "Cập nhật sau", note: ""},
+            {name: "SirHurt", plat: "Windows", status: "working", price: "none", time: "Cập nhật sau", note: ""},
+            {name: "Xeno", plat: "Windows", status: "working", price: "Free", time: "Cập nhật sau", note: ""},
+            {name: "Solara", plat: "Windows", status: "working", price: "Free", time: "Cập nhật sau", note: ""},
+            {name: "TDT", plat: "Windows", status: "working", price: "Free", time: "Cập nhật sau", note: ""},
+            {name: "Sapphire", plat: "Windows", status: "outdated", price: "Free", time: "Cập nhật sau", note: ""},
+            {name: "Real", plat: "Windows", status: "working", price: "Free", time: "Cập nhật sau", note: ""},
+            {name: "Vortex", plat: "Windows", status: "working", price: "Free", time: "Cập nhật sau", note: ""},
+            {name: "Opiumware", plat: "Mac", status: "working", price: "Free", time: "Cập nhật sau", note: ""},
+            {name: "MacSploit", plat: "Mac", status: "patched", price: "Paid", time: "Cập nhật sau", note: ""},
+            {name: "Delta", plat: "Android", status: "working", price: "Free", time: "Cập nhật sau", note: ""},
+            {name: "Codex", plat: "Android", status: "working", price: "Free", time: "Cập nhật sau", note: ""},
+            {name: "Vega X", plat: "Android", status: "working", price: "Free", time: "Cập nhật sau", note: ""},
+            {name: "Delta", plat: "iOS", status: "working", price: "Free", time: "Cập nhật sau", note: ""}
+        ];
+
         let data = [];
 
         const authSection = document.getElementById('authSection');
@@ -147,6 +194,7 @@
         const adminTableBody = document.getElementById('adminTableBody');
         const saveDataBtn = document.getElementById('saveDataBtn');
         const addRowBtn = document.getElementById('addRowBtn');
+        const resetDataBtn = document.getElementById('resetDataBtn');
 
         function showToast(msg) {
             const toast = document.getElementById('toast');
@@ -170,9 +218,11 @@
         async function loadAdminData() {
             try {
                 const res = await fetch(API_URL);
-                data = await res.json();
+                const result = await res.json();
+                data = Array.isArray(result) && result.length > 0 ? result : defaultData;
             } catch (err) {
                 console.error(err);
+                data = defaultData;
             }
             renderAdminRows(data);
         }
@@ -236,6 +286,14 @@
                 </td>
             `;
             adminTableBody.prepend(tr);
+        });
+
+        // Xử lý nút Khôi phục cài đặt gốc
+        resetDataBtn.addEventListener('click', () => {
+            if (confirm("⚠️ Bạn có chắc chắn muốn KHÔI PHỤC cài đặt gốc?\n\nToàn bộ dữ liệu hiện tại trên bảng sẽ bị thay thế bằng danh sách mặc định ban đầu.")) {
+                renderAdminRows(defaultData);
+                showToast("🔄 Đã đặt lại về dữ liệu gốc! Hãy nhấn 'Lưu & Đồng Bộ' để cập nhật lên server.");
+            }
         });
 
         saveDataBtn.addEventListener('click', async () => {
