@@ -120,8 +120,7 @@
         .btn:hover { opacity: 0.92; transform: translateY(-2px); }
         .btn-success { background: #10b981; }
         .btn-warning { background: #f59e0b; color: #000; font-weight: 700; }
-        .btn-danger { background: #ef4444; padding: 6px 12px; font-size: 0.82rem; }
-        .btn-restore { background: #3b82f6; padding: 6px 12px; font-size: 0.82rem; }
+        .btn-danger { background: #ef4444; }
 
         .table-wrap { overflow-x: auto; }
 
@@ -190,14 +189,6 @@
         .toast-error { background: rgba(239, 68, 68, 0.9); }
         .toast-info { background: rgba(139, 92, 246, 0.9); }
         .toast-warning { background: rgba(245, 158, 11, 0.95); color: #000; }
-
-        .badge-count {
-            background: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
-            padding: 2px 10px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-        }
     </style>
 </head>
 <body>
@@ -220,7 +211,6 @@
         <div class="top-bar">
             <h1><i class="fas fa-user-gear"></i> Trang Quản Lý Admin</h1>
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <!-- NÚT KHÔI PHỤC CÀI ĐẶT GỐC -->
                 <button class="btn btn-warning" onclick="resetToDefault()"><i class="fas fa-rotate-left"></i> KHÔI PHỤC CÀI ĐẶT GỐC</button>
                 <button class="btn btn-danger" onclick="logoutAdmin()"><i class="fas fa-right-from-bracket"></i> Đăng Xuất</button>
             </div>
@@ -232,11 +222,11 @@
             <div class="form-grid">
                 <div class="form-group full-width">
                     <label>Tiêu Đề Chính (H1)</label>
-                    <input type="text" id="siteTitleInput" placeholder="Ví dụ: Roblox Executors Status">
+                    <input type="text" id="siteTitleInput" placeholder="Roblox Executors Status">
                 </div>
                 <div class="form-group full-width">
                     <label>Dòng Mô Tả Phụ (Subtitle)</label>
-                    <input type="text" id="siteSubtitleInput" placeholder="Ví dụ: Trạng thái cập nhật liên tục...">
+                    <input type="text" id="siteSubtitleInput" placeholder="Trạng thái cập nhật liên tục...">
                 </div>
             </div>
         </div>
@@ -273,7 +263,7 @@
                 </div>
                 <div class="form-group">
                     <label>Thời Gian Cập Nhật</label>
-                    <input type="text" id="addTime" placeholder="Ví dụ: Vừa cập nhật">
+                    <input type="text" id="addTime" placeholder="Ví dụ: Cập nhật sau">
                 </div>
                 <div class="form-group">
                     <label>Ghi Chú</label>
@@ -307,36 +297,13 @@
                 </table>
             </div>
         </div>
-
-        <!-- THÙNG RÁC -->
-        <div class="card" style="border-color: rgba(239, 68, 68, 0.3);">
-            <h2>
-                <span><i class="fas fa-trash-can" style="color: #ef4444;"></i> Thùng Rác Tạm</span>
-                <span id="trashCount" class="badge-count">0</span>
-            </h2>
-
-            <div class="table-wrap">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Tên</th>
-                            <th>Nền tảng</th>
-                            <th>Trạng thái</th>
-                            <th>Khôi phục</th>
-                            <th>Xóa hẳn</th>
-                        </tr>
-                    </thead>
-                    <tbody id="trashTableBody"></tbody>
-                </table>
-            </div>
-        </div>
     </div>
 
     <script>
         const ADMIN_PASSWORD = "quanghuy90";
         const API_URL = "https://api.npoint.io/9d78b91f5a0f7c9f5ec8";
 
-        // DỮ LIỆU CÀI ĐẶT GỐC MẶC ĐỊNH
+        // DỮ LIỆU CÀI ĐẶT GỐC MẶC ĐỊNH CHUẨN 100%
         const DEFAULT_TITLE = "Roblox Executors Status";
         const DEFAULT_SUBTITLE = "Trạng thái cập nhật liên tục các Executor cho Windows, Android, iOS & Mac";
         const DEFAULT_ITEMS = [
@@ -356,7 +323,6 @@
         let siteTitle = DEFAULT_TITLE;
         let siteSubtitle = DEFAULT_SUBTITLE;
         let itemsList = [];
-        let trashList = [];
 
         function showToast(message, type = 'success') {
             const container = document.getElementById('toastContainer');
@@ -401,18 +367,15 @@
 
                 if (Array.isArray(data)) {
                     itemsList = data;
-                    trashList = [];
                 } else if (data && typeof data === 'object') {
                     siteTitle = data.title || siteTitle;
                     siteSubtitle = data.subtitle || siteSubtitle;
                     itemsList = Array.isArray(data.items) ? data.items : [];
-                    trashList = Array.isArray(data.trash) ? data.trash : [];
                 }
 
                 document.getElementById('siteTitleInput').value = siteTitle;
                 document.getElementById('siteSubtitleInput').value = siteSubtitle;
                 renderAdminTable();
-                renderTrashTable();
             } catch (err) {
                 showToast("Lỗi tải dữ liệu!", "error");
             }
@@ -421,7 +384,7 @@
         function renderAdminTable() {
             const tbody = document.getElementById('adminTableBody');
             if (itemsList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color: var(--text-sub);">Chưa có mục nào. Hãy thêm mới!</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color: var(--text-sub);">Chưa có mục nào. Hãy bấm "KHÔI PHỤC CÀI ĐẶT GỐC" hoặc thêm mới!</td></tr>`;
                 return;
             }
 
@@ -447,69 +410,33 @@
                     <td><input type="text" value="${item.price || ''}" oninput="updateItem(${index}, 'price', this.value)"></td>
                     <td><input type="text" value="${item.time || ''}" oninput="updateItem(${index}, 'time', this.value)"></td>
                     <td><input type="text" value="${item.note || ''}" oninput="updateItem(${index}, 'note', this.value)"></td>
-                    <td><button class="btn btn-danger" onclick="moveToTrash(${index})"><i class="fas fa-trash"></i></button></td>
-                </tr>
-            `).join('');
-        }
-
-        function renderTrashTable() {
-            const tbody = document.getElementById('trashTableBody');
-            document.getElementById('trashCount').textContent = trashList.length;
-
-            if (trashList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color: var(--text-sub);">Thùng rác trống.</td></tr>`;
-                return;
-            }
-
-            tbody.innerHTML = trashList.map((item, index) => `
-                <tr>
-                    <td style="color: #fff; font-weight:600;">${item.name || ''}</td>
-                    <td>${item.plat || ''}</td>
-                    <td>${item.status || ''}</td>
-                    <td><button class="btn btn-restore" onclick="restoreFromTrash(${index})"><i class="fas fa-rotate-left"></i> Khôi phục</button></td>
-                    <td><button class="btn btn-danger" onclick="deletePermanently(${index})"><i class="fas fa-xmark"></i> Xóa vĩnh viễn</button></td>
+                    <td><button class="btn btn-danger" style="padding: 6px 12px; font-size: 0.82rem;" onclick="deleteItem(${index})"><i class="fas fa-trash"></i></button></td>
                 </tr>
             `).join('');
         }
 
         function updateItem(index, key, value) { itemsList[index][key] = value; }
 
-        function moveToTrash(index) {
-            const deletedItem = itemsList.splice(index, 1)[0];
-            trashList.unshift(deletedItem);
+        // XÓA MỤC TRỰC TIẾP
+        function deleteItem(index) {
+            const removed = itemsList.splice(index, 1)[0];
             renderAdminTable();
-            renderTrashTable();
-            showToast("Đã chuyển vào Thùng rác (Nhớ bấm LƯU)", "info");
+            showToast(`Đã xóa ${removed.name || 'mục'}! Nhớ bấm LƯU để áp dụng.`, "info");
         }
 
-        function restoreFromTrash(index) {
-            const restoredItem = trashList.splice(index, 1)[0];
-            itemsList.push(restoredItem);
-            renderAdminTable();
-            renderTrashTable();
-            showToast("Đã khôi phục về bảng chính!", "info");
-        }
-
-        function deletePermanently(index) {
-            trashList.splice(index, 1);
-            renderTrashTable();
-            showToast("Đã xóa vĩnh viễn!", "info");
-        }
-
-        // HÀM KHÔI PHỤC TOÀN BỘ VỀ CÀI ĐẶT GỐC
-        function resetToDefault() {
-            if (confirm("Bạn có chắc chắn muốn KHÔI PHỤC TOÀN BỘ Tiêu đề, Mô tả và Danh sách về CÀI ĐẶT GỐC ban đầu?")) {
+        // KHÔI PHỤC VỀ CÀI ĐẶT GỐC VÀ TỰ ĐỒNG BỘ NGAY LẬP TỨC
+        async function resetToDefault() {
+            if (confirm("XÁC NHẬN: Bạn có chắc chắn muốn KHÔI PHỤC TOÀN BỘ danh sách & tiêu đề về CÀI ĐẶT GỐC ban đầu?")) {
                 siteTitle = DEFAULT_TITLE;
                 siteSubtitle = DEFAULT_SUBTITLE;
                 itemsList = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
-                trashList = [];
 
                 document.getElementById('siteTitleInput').value = siteTitle;
                 document.getElementById('siteSubtitleInput').value = siteSubtitle;
 
                 renderAdminTable();
-                renderTrashTable();
-                showToast("Đã khôi phục Cài đặt gốc! Bấm 'LƯU & ĐỒNG BỘ' để áp dụng.", "warning");
+                await saveAllData();
+                showToast("Đã KHÔI PHỤC CÀI ĐẶT GỐC thành công!", "success");
             }
         }
 
@@ -525,7 +452,7 @@
                 plat: document.getElementById('addPlat').value,
                 status: document.getElementById('addStatus').value,
                 price: document.getElementById('addPrice').value.trim() || 'Free',
-                time: document.getElementById('addTime').value.trim() || 'Vừa xong',
+                time: document.getElementById('addTime').value.trim() || 'Cập nhật sau',
                 note: document.getElementById('addNote').value.trim() || '-'
             });
 
@@ -542,8 +469,7 @@
             const payload = {
                 title: document.getElementById('siteTitleInput').value.trim() || DEFAULT_TITLE,
                 subtitle: document.getElementById('siteSubtitleInput').value.trim() || DEFAULT_SUBTITLE,
-                items: itemsList,
-                trash: trashList
+                items: itemsList
             };
 
             showToast("Đang đồng bộ dữ liệu...", "info");
