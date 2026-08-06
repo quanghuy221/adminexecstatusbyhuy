@@ -9,7 +9,7 @@
     <style>
         :root { 
             --bg: #030712; 
-            --glass: rgba(15, 23, 42, 0.95); 
+            --glass: rgba(15, 23, 42, 0.85); 
             --accent: #8b5cf6; 
             --border: rgba(255, 255, 255, 0.1);
             --text-main: #f8fafc;
@@ -24,214 +24,252 @@
             color: var(--text-main); 
             font-family: 'Outfit', sans-serif; 
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            padding: 30px 15px;
             background-image: 
                 radial-gradient(circle at 15% 15%, rgba(139, 92, 246, 0.12) 0%, transparent 45%),
                 radial-gradient(circle at 85% 85%, rgba(6, 182, 212, 0.1) 0%, transparent 45%);
             background-attachment: fixed;
         }
 
-        .admin-card {
+        .container { max-width: 1000px; margin: 0 auto; }
+
+        h1 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 25px;
+            background: linear-gradient(135deg, #a78bfa, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .card {
             background: var(--glass);
-            border: 1px solid var(--accent);
-            border-radius: 20px;
-            padding: 24px;
-            width: 100%;
-            max-width: 1100px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
             backdrop-filter: blur(10px);
-            animation: fadeIn 0.3s ease;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .card h2 {
+            font-size: 1.1rem;
+            color: #a78bfa;
+            margin: 0 0 15px 0;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .auth-container { text-align: center; padding: 40px 10px; }
-        .auth-form { display: flex; gap: 10px; max-width: 360px; margin: 20px auto 0; flex-direction: column; }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+            margin-bottom: 15px;
+        }
 
-        input, select { 
-            background: rgba(30, 41, 59, 0.8); 
-            border: 1px solid var(--border); 
-            color: white; 
-            padding: 10px 14px; 
-            border-radius: 10px; 
-            outline: none; 
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group.full-width { grid-column: 1 / -1; }
+
+        label { font-size: 0.85rem; color: var(--text-sub); font-weight: 500; }
+
+        input, select {
+            padding: 10px 12px;
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: white;
             font-family: 'Outfit', sans-serif;
             font-size: 0.9rem;
-            width: 100%;
-            transition: border-color 0.2s ease;
+            outline: none;
+            transition: border-color 0.2s;
         }
 
         input:focus, select:focus { border-color: var(--accent); }
 
         .btn {
-            background: var(--accent); color: white; border: none; padding: 12px 20px;
-            border-radius: 12px; font-weight: 600; font-family: 'Outfit', sans-serif;
-            cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Outfit', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
             transition: all 0.2s ease;
         }
+
         .btn:hover { opacity: 0.9; transform: translateY(-1px); }
-        .btn:active { transform: translateY(0); }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-        .btn-secondary { background: rgba(255, 255, 255, 0.1); color: var(--text-main); }
-        .btn-danger { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
-        .btn-danger:hover { background: rgba(239, 68, 68, 0.35); }
+        .btn-success { background: #10b981; }
+        .btn-danger { background: #ef4444; padding: 6px 12px; font-size: 0.8rem; }
 
-        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
-
-        .admin-table-container { overflow-x: auto; max-height: 60vh; margin-bottom: 20px; border-radius: 12px; border: 1px solid var(--border); }
-        table { width: 100%; border-collapse: collapse; min-width: 800px; }
-        th { color: var(--text-sub); font-size: 0.75rem; text-transform: uppercase; padding: 12px 10px; border-bottom: 1px solid var(--border); text-align: left; background: rgba(15, 23, 42, 0.95); position: sticky; top: 0; z-index: 10; }
-        td { padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.03); }
-
-        .admin-actions { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
-
-        .toast {
-            position: fixed; bottom: 20px; right: 20px; background: rgba(16, 185, 129, 0.95);
-            color: white; padding: 14px 24px; border-radius: 12px; font-weight: 600;
-            display: flex; align-items: center; gap: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            transform: translateY(100px); opacity: 0; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 10000;
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
-        .toast.show { transform: translateY(0); opacity: 1; }
 
-        @media (max-width: 768px) {
-            .admin-actions { flex-direction: column; align-items: stretch; }
-            .admin-actions > div { display: flex; flex-direction: column; gap: 8px; }
+        .table-wrap { overflow-x: auto; }
+
+        table { width: 100%; border-collapse: collapse; min-width: 650px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid rgba(255, 255, 255, 0.05); font-size: 0.9rem; }
+        th { color: var(--text-sub); font-size: 0.8rem; text-transform: uppercase; }
+
+        .status-toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 10px;
+            background: #10b981;
+            color: white;
+            font-weight: 600;
+            display: none;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+            z-index: 99;
         }
     </style>
 </head>
 <body>
 
-    <div class="toast" id="toast"><i class="fas fa-circle-check"></i> <span id="toastMsg">Thành công!</span></div>
+    <div class="container">
+        <h1><i class="fas fa-user-gear"></i> Trang Quản Lý Admin</h1>
 
-    <div class="admin-card">
-        <!-- ĐĂNG NHẬP -->
-        <div id="authSection" class="auth-container">
-            <i class="fas fa-shield-halved" style="font-size:3.5rem; color:var(--accent);"></i>
-            <h2 style="margin: 15px 0 5px 0;">Hệ Thống Quản Trị</h2>
-            <p style="color:var(--text-sub); font-size:0.9rem; margin:0;">Nhập mật khẩu để tiếp tục</p>
-            <div class="auth-form">
-                <input type="password" id="adminPassInput" placeholder="Mật khẩu Admin..." autofocus>
-                <button class="btn" id="loginBtn"><i class="fas fa-right-to-bracket"></i> Đăng Nhập</button>
+        <!-- CẤU HÌNH TIÊU ĐỀ TRANG WEB -->
+        <div class="card">
+            <h2><i class="fas fa-heading"></i> Cấu Hình Tiêu Đề & Mô Tả Trang Web</h2>
+            <div class="form-grid">
+                <div class="form-group full-width">
+                    <label>Tiêu Đề Chính (H1)</label>
+                    <input type="text" id="siteTitleInput" placeholder="Ví dụ: Roblox Executors Status">
+                </div>
+                <div class="form-group full-width">
+                    <label>Dòng Mô Tả Phụ (Subtitle)</label>
+                    <input type="text" id="siteSubtitleInput" placeholder="Ví dụ: Trạng thái cập nhật liên tục các Executor...">
+                </div>
             </div>
         </div>
 
-        <!-- BẢNG CHỈNH SỬA -->
-        <div id="mainSection" style="display: none;">
-            <div class="admin-header">
-                <h2 style="margin:0; font-size:1.3rem;"><i class="fas fa-sliders" style="color:var(--accent);"></i> Admin Dashboard</h2>
-                <button class="btn btn-secondary" onclick="location.reload()"><i class="fas fa-power-off"></i> Đăng xuất</button>
+        <!-- QUẢN LÝ DANH SÁCH EXECUTOR -->
+        <div class="card">
+            <h2><i class="fas fa-plus-circle"></i> Thêm Executor Mới</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Tên Executor</label>
+                    <input type="text" id="addName" placeholder="Ví dụ: Potassium">
+                </div>
+                <div class="form-group">
+                    <label>Nền Tảng</label>
+                    <select id="addPlat">
+                        <option value="Windows">Windows</option>
+                        <option value="Android">Android</option>
+                        <option value="iOS">iOS</option>
+                        <option value="Mac">Mac</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Trạng Thái</label>
+                    <select id="addStatus">
+                        <option value="WORKING">WORKING</option>
+                        <option value="PATCHED">PATCHED</option>
+                        <option value="UNSTABLE">UNSTABLE</option>
+                        <option value="OUTDATED">OUTDATED</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Giá Tiền</label>
+                    <input type="text" id="addPrice" placeholder="Ví dụ: Free hoặc 549k">
+                </div>
+                <div class="form-group">
+                    <label>Thời Gian Cập Nhật</label>
+                    <input type="text" id="addTime" placeholder="Ví dụ: Vừa cập nhật">
+                </div>
+                <div class="form-group">
+                    <label>Ghi Chú</label>
+                    <input type="text" id="addNote" placeholder="Ghi chú thêm...">
+                </div>
+            </div>
+            <button class="btn" onclick="addExecutor()"><i class="fas fa-plus"></i> Thêm Vào Danh Sách</button>
+        </div>
+
+        <!-- DANH SÁCH & NÚT LƯU -->
+        <div class="card">
+            <div class="top-bar">
+                <h2 style="border:none; margin:0; padding:0;"><i class="fas fa-list"></i> Danh Sách Executor Hiện Tại</h2>
+                <button class="btn btn-success" onclick="saveAllData()"><i class="fas fa-cloud-arrow-up"></i> LƯU & ĐỒNG BỘ LÊN WEBSITES</button>
             </div>
 
-            <div class="admin-table-container">
+            <div class="table-wrap">
                 <table>
                     <thead>
                         <tr>
-                            <th>Tên Executor</th>
+                            <th>Tên</th>
                             <th>Nền tảng</th>
                             <th>Trạng thái</th>
-                            <th>Giá tiền</th>
-                            <th>Last Update</th>
+                            <th>Giá</th>
+                            <th>Cập nhật</th>
                             <th>Ghi chú</th>
-                            <th style="text-align: center;">Xóa</th>
+                            <th>Thao tác</th>
                         </tr>
                     </thead>
-                    <tbody id="adminTableBody"></tbody>
+                    <tbody id="adminTableBody">
+                        <!-- Render JS -->
+                    </tbody>
                 </table>
-            </div>
-
-            <div class="admin-actions">
-                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                    <button class="btn btn-secondary" id="addRowBtn"><i class="fas fa-plus"></i> Thêm Hàng Mới</button>
-                    <button class="btn btn-danger" id="resetDataBtn"><i class="fas fa-rotate-left"></i> Khôi Phục Cài Đặt Gốc</button>
-                </div>
-                <button class="btn" id="saveDataBtn"><i class="fas fa-cloud-arrow-up"></i> Lưu & Đồng Bộ Lên Web</button>
             </div>
         </div>
     </div>
 
+    <div id="toast" class="status-toast">Đã đồng bộ thành công!</div>
+
     <script>
         const API_URL = "https://api.npoint.io/9d78b91f5a0f7c9f5ec8";
-        const ADMIN_PASS = "quanghuy90"; // Đã đổi mật khẩu tại đây
 
-        const defaultData = [
-            {name: "Potassium", plat: "Windows", status: "working", price: "549k", time: "Cập nhật sau", note: ""},
-            {name: "Volt", plat: "Windows", status: "working", price: "149 - 499k", time: "Cập nhật sau", note: ""},
-            {name: "Wave", plat: "Windows", status: "working", price: "139 - 489k", time: "Cập nhật sau", note: ""},
-            {name: "Ronix", plat: "Windows", status: "outdated", price: "Free", time: "Cập nhật sau", note: ""},
-            {name: "Synapse Z", plat: "Windows", status: "outdated", price: "none", time: "Cập nhật sau", note: ""},
-            {name: "Seliware", plat: "Windows", status: "outdated", price: "none", time: "Cập nhật sau", note: ""},
-            {name: "Madium V2", plat: "Windows", status: "working", price: "Free", time: "Cập nhật sau", note: ""},
-            {name: "Cosmic", plat: "Windows", status: "unstable", price: "none", time: "Cập nhật sau", note: ""},
-            {name: "Velocity", plat: "Windows", status: "working", price: "Free", time: "Cập nhật sau", note: ""},
-            {name: "SirHurt", plat: "Windows", status: "working", price: "none", time: "Cập nhật sau", note: ""},
-            {name: "Xeno", plat: "Windows", status: "working", price: "Free", time: "Cập nhật sau", note: ""},
-            {name: "Solara", plat: "Windows", status: "working", price: "Free", time: "Cập nhật sau", note: ""},
-            {name: "TDT", plat: "Windows", status: "working", price: "Free", time: "Cập nhật sau", note: ""},
-            {name: "Sapphire", plat: "Windows", status: "outdated", price: "Free", time: "Cập nhật sau", note: ""},
-            {name: "Real", plat: "Windows", status: "working", price: "Free", time: "Cập nhật sau", note: ""},
-            {name: "Vortex", plat: "Windows", status: "working", price: "Free", time: "Cập nhật sau", note: ""},
-            {name: "Opiumware", plat: "Mac", status: "working", price: "Free", time: "Cập nhật sau", note: ""},
-            {name: "MacSploit", plat: "Mac", status: "patched", price: "Paid", time: "Cập nhật sau", note: ""},
-            {name: "Delta", plat: "Android", status: "working", price: "Free", time: "Cập nhật sau", note: ""},
-            {name: "Codex", plat: "Android", status: "working", price: "Free", time: "Cập nhật sau", note: ""},
-            {name: "Vega X", plat: "Android", status: "working", price: "Free", time: "Cập nhật sau", note: ""},
-            {name: "Delta", plat: "iOS", status: "working", price: "Free", time: "Cập nhật sau", note: ""}
-        ];
-
-        let data = [];
-
-        const authSection = document.getElementById('authSection');
-        const mainSection = document.getElementById('mainSection');
-        const adminPassInput = document.getElementById('adminPassInput');
-        const loginBtn = document.getElementById('loginBtn');
-        const adminTableBody = document.getElementById('adminTableBody');
-        const saveDataBtn = document.getElementById('saveDataBtn');
-        const addRowBtn = document.getElementById('addRowBtn');
-        const resetDataBtn = document.getElementById('resetDataBtn');
-
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            document.getElementById('toastMsg').innerText = msg;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
-        }
-
-        loginBtn.addEventListener('click', async () => {
-            if (adminPassInput.value === ADMIN_PASS) {
-                authSection.style.display = 'none';
-                mainSection.style.display = 'block';
-                await loadAdminData();
-            } else {
-                showToast("❌ Sai mật khẩu Admin!");
-            }
-        });
-
-        adminPassInput.addEventListener('keydown', e => { if (e.key === 'Enter') loginBtn.click(); });
+        let siteTitle = "Roblox Executors Status";
+        let siteSubtitle = "Trạng thái cập nhật liên tục các Executor cho Windows, Android, iOS & Mac";
+        let itemsList = [];
 
         async function loadAdminData() {
             try {
-                const res = await fetch(API_URL);
-                const result = await res.json();
-                data = Array.isArray(result) && result.length > 0 ? result : defaultData;
+                const res = await fetch(API_URL + "?t=" + new Date().getTime());
+                const data = await res.json();
+
+                if (Array.isArray(data)) {
+                    itemsList = data;
+                } else if (data && typeof data === 'object') {
+                    siteTitle = data.title || siteTitle;
+                    siteSubtitle = data.subtitle || siteSubtitle;
+                    itemsList = Array.isArray(data.items) ? data.items : [];
+                }
+
+                document.getElementById('siteTitleInput').value = siteTitle;
+                document.getElementById('siteSubtitleInput').value = siteSubtitle;
+                renderAdminTable();
             } catch (err) {
-                console.error(err);
-                data = defaultData;
+                console.error("Lỗi khi tải dữ liệu:", err);
             }
-            renderAdminRows(data);
         }
 
-        function renderAdminRows(items) {
-            adminTableBody.innerHTML = items.map((item) => `
-                <tr class="admin-row">
-                    <td><input type="text" class="row-name" value="${item.name}"></td>
+        function renderAdminTable() {
+            const tbody = document.getElementById('adminTableBody');
+            if (itemsList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color: var(--text-sub);">Chưa có dữ liệu. Hãy thêm mới!</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = itemsList.map((item, index) => `
+                <tr>
+                    <td><input type="text" value="${item.name || ''}" onchange="updateItem(${index}, 'name', this.value)"></td>
                     <td>
-                        <select class="row-plat">
+                        <select onchange="updateItem(${index}, 'plat', this.value)">
                             <option value="Windows" ${item.plat === 'Windows' ? 'selected' : ''}>Windows</option>
                             <option value="Android" ${item.plat === 'Android' ? 'selected' : ''}>Android</option>
                             <option value="iOS" ${item.plat === 'iOS' ? 'selected' : ''}>iOS</option>
@@ -239,119 +277,87 @@
                         </select>
                     </td>
                     <td>
-                        <select class="row-status">
-                            <option value="working" ${item.status === 'working' ? 'selected' : ''}>WORKING</option>
-                            <option value="patched" ${item.status === 'patched' ? 'selected' : ''}>PATCHED</option>
-                            <option value="unstable" ${item.status === 'unstable' ? 'selected' : ''}>UNSTABLE</option>
-                            <option value="outdated" ${item.status === 'outdated' ? 'selected' : ''}>OUTDATED</option>
+                        <select onchange="updateItem(${index}, 'status', this.value)">
+                            <option value="WORKING" ${item.status === 'WORKING' ? 'selected' : ''}>WORKING</option>
+                            <option value="PATCHED" ${item.status === 'PATCHED' ? 'selected' : ''}>PATCHED</option>
+                            <option value="UNSTABLE" ${item.status === 'UNSTABLE' ? 'selected' : ''}>UNSTABLE</option>
+                            <option value="OUTDATED" ${item.status === 'OUTDATED' ? 'selected' : ''}>OUTDATED</option>
                         </select>
                     </td>
-                    <td><input type="text" class="row-price" value="${item.price}"></td>
-                    <td><input type="text" class="row-time" value="${item.time}"></td>
-                    <td><input type="text" class="row-note" value="${item.note || ''}"></td>
-                    <td style="text-align: center;">
-                        <button class="btn btn-danger" style="padding: 6px 10px;" onclick="this.closest('tr').remove()"><i class="fas fa-trash"></i></button>
-                    </td>
+                    <td><input type="text" value="${item.price || ''}" onchange="updateItem(${index}, 'price', this.value)"></td>
+                    <td><input type="text" value="${item.time || ''}" onchange="updateItem(${index}, 'time', this.value)"></td>
+                    <td><input type="text" value="${item.note || ''}" onchange="updateItem(${index}, 'note', this.value)"></td>
+                    <td><button class="btn btn-danger" onclick="deleteItem(${index})"><i class="fas fa-trash"></i></button></td>
                 </tr>
             `).join('');
         }
 
-        addRowBtn.addEventListener('click', () => {
-            const tr = document.createElement('tr');
-            tr.className = 'admin-row';
-            tr.innerHTML = `
-                <td><input type="text" class="row-name" value="Executor Mới"></td>
-                <td>
-                    <select class="row-plat">
-                        <option value="Windows">Windows</option>
-                        <option value="Android">Android</option>
-                        <option value="iOS">iOS</option>
-                        <option value="Mac">Mac</option>
-                    </select>
-                </td>
-                <td>
-                    <select class="row-status">
-                        <option value="working">WORKING</option>
-                        <option value="patched">PATCHED</option>
-                        <option value="unstable">UNSTABLE</option>
-                        <option value="outdated">OUTDATED</option>
-                    </select>
-                </td>
-                <td><input type="text" class="row-price" value="Free"></td>
-                <td><input type="text" class="row-time" value="Mới cập nhật"></td>
-                <td><input type="text" class="row-note" value=""></td>
-                <td style="text-align: center;">
-                    <button class="btn btn-danger" style="padding: 6px 10px;" onclick="this.closest('tr').remove()"><i class="fas fa-trash"></i></button>
-                </td>
-            `;
-            adminTableBody.prepend(tr);
-        });
+        function updateItem(index, key, value) {
+            itemsList[index][key] = value;
+        }
 
-        resetDataBtn.addEventListener('click', () => {
-            if (confirm("⚠️ Bạn có chắc chắn muốn KHÔI PHỤC cài đặt gốc?\n\nToàn bộ dữ liệu hiện tại sẽ được thay thế bằng danh sách mặc định.")) {
-                renderAdminRows(defaultData);
-                showToast("🔄 Đã đặt lại về dữ liệu gốc! Bấm 'Lưu & Đồng Bộ' để cập nhật.");
+        function deleteItem(index) {
+            itemsList.splice(index, 1);
+            renderAdminTable();
+        }
+
+        function addExecutor() {
+            const name = document.getElementById('addName').value.trim();
+            if (!name) {
+                alert("Vui lòng nhập tên Executor!");
+                return;
             }
-        });
 
-        // Hàm lưu cải tiến chống treo nút
-        saveDataBtn.addEventListener('click', async () => {
-            const rows = document.querySelectorAll('.admin-row');
-            const newData = [];
-            rows.forEach(row => {
-                newData.push({
-                    name: row.querySelector('.row-name').value.trim(),
-                    plat: row.querySelector('.row-plat').value,
-                    status: row.querySelector('.row-status').value,
-                    price: row.querySelector('.row-price').value.trim(),
-                    time: row.querySelector('.row-time').value.trim(),
-                    note: row.querySelector('.row-note').value.trim()
-                });
+            itemsList.unshift({
+                name: name,
+                plat: document.getElementById('addPlat').value,
+                status: document.getElementById('addStatus').value,
+                price: document.getElementById('addPrice').value.trim() || 'Free',
+                time: document.getElementById('addTime').value.trim() || 'Vừa xong',
+                note: document.getElementById('addNote').value.trim() || ''
             });
 
-            saveDataBtn.disabled = true;
-            saveDataBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Đang lưu...`;
+            document.getElementById('addName').value = '';
+            document.getElementById('addPrice').value = '';
+            document.getElementById('addTime').value = '';
+            document.getElementById('addNote').value = '';
 
-            // Cấu hình Timeout ngắt sau 8 giây
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 8000);
+            renderAdminTable();
+        }
+
+        async function saveAllData() {
+            const payload = {
+                title: document.getElementById('siteTitleInput').value.trim() || "Roblox Executors Status",
+                subtitle: document.getElementById('siteSubtitleInput').value.trim() || "Trạng thái cập nhật liên tục các Executor",
+                items: itemsList
+            };
 
             try {
-                let response = await fetch(API_URL, {
+                const res = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(newData),
-                    signal: controller.signal
+                    body: JSON.stringify(payload)
                 });
 
-                if (!response.ok) {
-                    // Thử lại bằng PUT nếu POST thất bại
-                    response = await fetch(API_URL, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(newData),
-                        signal: controller.signal
-                    });
+                if (res.ok) {
+                    showToast("Đã lưu Tiêu đề & Danh sách lên máy chủ!");
+                } else {
+                    alert("Lưu thất bại, thử lại sau!");
                 }
-
-                clearTimeout(timeoutId);
-
-                if (!response.ok) throw new Error("Mã lỗi: " + response.status);
-
-                showToast("🌐 Đã lưu & Đồng bộ thành công!");
             } catch (err) {
                 console.error(err);
-                if (err.name === 'AbortError') {
-                    showToast("❌ Kết nối quá thời gian! Kiểm tra lại mạng.");
-                } else {
-                    showToast("❌ Không thể lưu lên server npoint!");
-                }
-            } finally {
-                clearTimeout(timeoutId);
-                saveDataBtn.disabled = false;
-                saveDataBtn.innerHTML = `<i class="fas fa-cloud-arrow-up"></i> Lưu & Đồng Bộ Lên Web`;
+                alert("Lỗi kết nối máy chủ!");
             }
-        });
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.style.display = 'block';
+            setTimeout(() => toast.style.display = 'none', 2500);
+        }
+
+        loadAdminData();
     </script>
 </body>
 </html>
