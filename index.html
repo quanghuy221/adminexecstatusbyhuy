@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal - Executors Status</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { 
+            --bg: #030712; 
+            --glass: rgba(15, 23, 42, 0.95); 
+            --accent: #8b5cf6; 
+            --border: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+        }
+
+        * { box-sizing: border-box; }
+
+        body { 
+            margin: 0; 
+            background: var(--bg); 
+            color: var(--text-main); 
+            font-family: 'Outfit', sans-serif; 
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .admin-card {
+            background: var(--glass);
+            border: 1px solid var(--accent);
+            border-radius: 20px;
+            padding: 24px;
+            width: 100%;
+            max-width: 1100px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        }
+
+        .auth-container { text-align: center; padding: 40px 10px; }
+        .auth-form { display: flex; gap: 10px; max-width: 360px; margin: 20px auto 0; flex-direction: column; }
+
+        input, select { 
+            background: rgba(30, 41, 59, 0.8); 
+            border: 1px solid var(--border); 
+            color: white; 
+            padding: 10px 14px; 
+            border-radius: 10px; 
+            outline: none; 
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem;
+            width: 100%;
+        }
+
+        input:focus, select:focus { border-color: var(--accent); }
+
+        .btn {
+            background: var(--accent); color: white; border: none; padding: 12px 20px;
+            border-radius: 12px; font-weight: 600; font-family: 'Outfit', sans-serif;
+            cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            transition: all 0.2s ease;
+        }
+        .btn:hover { opacity: 0.9; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-secondary { background: rgba(255, 255, 255, 0.1); color: var(--text-main); }
+        .btn-danger { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+
+        .admin-table-container { overflow-x: auto; max-height: 60vh; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th { color: var(--text-sub); font-size: 0.75rem; text-transform: uppercase; padding: 10px; border-bottom: 1px solid var(--border); text-align: left; }
+        td { padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.03); }
+
+        .admin-actions { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+        .toast {
+            position: fixed; bottom: 20px; right: 20px; background: rgba(16, 185, 129, 0.95);
+            color: white; padding: 14px 24px; border-radius: 12px; font-weight: 600;
+            display: flex; align-items: center; gap: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            transform: translateY(100px); opacity: 0; transition: all 0.3s ease; z-index: 10000;
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+    </style>
+</head>
+<body>
+
+    <div class="toast" id="toast"><i class="fas fa-circle-check"></i> <span id="toastMsg">Thành công!</span></div>
+
+    <div class="admin-card">
+        <!-- ĐĂNG NHẬP -->
+        <div id="authSection" class="auth-container">
+            <i class="fas fa-shield-halved" style="font-size:3.5rem; color:var(--accent);"></i>
+            <h2 style="margin: 15px 0 5px 0;">Hệ Thống Quản Trị</h2>
+            <p style="color:var(--text-sub); font-size:0.9rem; margin:0;">Nhập mật khẩu để tiếp tục</p>
+            <div class="auth-form">
+                <input type="password" id="adminPassInput" placeholder="Mật khẩu Admin..." autofocus>
+                <button class="btn" id="loginBtn"><i class="fas fa-right-to-bracket"></i> Đăng Nhập</button>
+            </div>
+        </div>
+
+        <!-- BẢNG CHỈNH SỬA -->
+        <div id="mainSection" style="display: none;">
+            <div class="admin-header">
+                <h2 style="margin:0; font-size:1.3rem;"><i class="fas fa-sliders" style="color:var(--accent);"></i> Admin Dashboard</h2>
+                <button class="btn btn-secondary" onclick="location.reload()"><i class="fas fa-power-off"></i> Đăng xuất</button>
+            </div>
+
+            <div class="admin-table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tên Executor</th>
+                            <th>Nền tảng</th>
+                            <th>Trạng thái</th>
+                            <th>Giá tiền</th>
+                            <th>Last Update</th>
+                            <th>Ghi chú</th>
+                            <th style="text-align: center;">Xóa</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminTableBody"></tbody>
+                </table>
+            </div>
+
+            <div class="admin-actions">
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn btn-secondary" id="addRowBtn"><i class="fas fa-plus"></i> Thêm Hàng Mới</button>
+                </div>
+                <button class="btn" id="saveDataBtn"><i class="fas fa-cloud-arrow-up"></i> Lưu & Đồng Bộ Lên Web</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = "https://api.npoint.io/9d78b91f5a0f7c9f5ec8";
+        const ADMIN_PASS = "daoquanghuy90";
+        let data = [];
+
+        const authSection = document.getElementById('authSection');
+        const mainSection = document.getElementById('mainSection');
+        const adminPassInput = document.getElementById('adminPassInput');
+        const loginBtn = document.getElementById('loginBtn');
+        const adminTableBody = document.getElementById('adminTableBody');
+        const saveDataBtn = document.getElementById('saveDataBtn');
+        const addRowBtn = document.getElementById('addRowBtn');
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        loginBtn.addEventListener('click', async () => {
+            if (adminPassInput.value === ADMIN_PASS) {
+                authSection.style.display = 'none';
+                mainSection.style.display = 'block';
+                await loadAdminData();
+            } else {
+                showToast("❌ Sai mật khẩu Admin!");
+            }
+        });
+
+        adminPassInput.addEventListener('keydown', e => { if (e.key === 'Enter') loginBtn.click(); });
+
+        async function loadAdminData() {
+            try {
+                const res = await fetch(API_URL);
+                data = await res.json();
+            } catch (err) {
+                console.error(err);
+            }
+            renderAdminRows(data);
+        }
+
+        function renderAdminRows(items) {
+            adminTableBody.innerHTML = items.map((item) => `
+                <tr class="admin-row">
+                    <td><input type="text" class="row-name" value="${item.name}"></td>
+                    <td>
+                        <select class="row-plat">
+                            <option value="Windows" ${item.plat === 'Windows' ? 'selected' : ''}>Windows</option>
+                            <option value="Android" ${item.plat === 'Android' ? 'selected' : ''}>Android</option>
+                            <option value="iOS" ${item.plat === 'iOS' ? 'selected' : ''}>iOS</option>
+                            <option value="Mac" ${item.plat === 'Mac' ? 'selected' : ''}>Mac</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="row-status">
+                            <option value="working" ${item.status === 'working' ? 'selected' : ''}>WORKING</option>
+                            <option value="patched" ${item.status === 'patched' ? 'selected' : ''}>PATCHED</option>
+                            <option value="unstable" ${item.status === 'unstable' ? 'selected' : ''}>UNSTABLE</option>
+                            <option value="outdated" ${item.status === 'outdated' ? 'selected' : ''}>OUTDATED</option>
+                        </select>
+                    </td>
+                    <td><input type="text" class="row-price" value="${item.price}"></td>
+                    <td><input type="text" class="row-time" value="${item.time}"></td>
+                    <td><input type="text" class="row-note" value="${item.note || ''}"></td>
+                    <td style="text-align: center;">
+                        <button class="btn btn-danger" style="padding: 6px 10px;" onclick="this.closest('tr').remove()"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        addRowBtn.addEventListener('click', () => {
+            const tr = document.createElement('tr');
+            tr.className = 'admin-row';
+            tr.innerHTML = `
+                <td><input type="text" class="row-name" value="Executor Mới"></td>
+                <td>
+                    <select class="row-plat">
+                        <option value="Windows">Windows</option>
+                        <option value="Android">Android</option>
+                        <option value="iOS">iOS</option>
+                        <option value="Mac">Mac</option>
+                    </select>
+                </td>
+                <td>
+                    <select class="row-status">
+                        <option value="working">WORKING</option>
+                        <option value="patched">PATCHED</option>
+                        <option value="unstable">UNSTABLE</option>
+                        <option value="outdated">OUTDATED</option>
+                    </select>
+                </td>
+                <td><input type="text" class="row-price" value="Free"></td>
+                <td><input type="text" class="row-time" value="Mới cập nhật"></td>
+                <td><input type="text" class="row-note" value=""></td>
+                <td style="text-align: center;">
+                    <button class="btn btn-danger" style="padding: 6px 10px;" onclick="this.closest('tr').remove()"><i class="fas fa-trash"></i></button>
+                </td>
+            `;
+            adminTableBody.prepend(tr);
+        });
+
+        saveDataBtn.addEventListener('click', async () => {
+            const rows = document.querySelectorAll('.admin-row');
+            const newData = [];
+            rows.forEach(row => {
+                newData.push({
+                    name: row.querySelector('.row-name').value.trim(),
+                    plat: row.querySelector('.row-plat').value,
+                    status: row.querySelector('.row-status').value,
+                    price: row.querySelector('.row-price').value.trim(),
+                    time: row.querySelector('.row-time').value.trim(),
+                    note: row.querySelector('.row-note').value.trim()
+                });
+            });
+
+            saveDataBtn.disabled = true;
+            saveDataBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Đang lưu...`;
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newData)
+                });
+
+                if (!response.ok) throw new Error("Status " + response.status);
+
+                showToast("🌐 Đã lưu & Đồng bộ thành công!");
+            } catch (err) {
+                console.error(err);
+                showToast("❌ Lỗi khi lưu dữ liệu!");
+            } finally {
+                saveDataBtn.disabled = false;
+                saveDataBtn.innerHTML = `<i class="fas fa-cloud-arrow-up"></i> Lưu & Đồng Bộ Lên Web`;
+            }
+        });
+    </script>
+</body>
+</html>
