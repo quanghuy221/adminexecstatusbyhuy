@@ -31,7 +31,7 @@
             background-attachment: fixed;
         }
 
-        .container { max-width: 1000px; margin: 0 auto; }
+        .container { max-width: 1000px; margin: 0 auto; display: none; }
 
         h1 {
             text-align: center;
@@ -60,11 +60,12 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            justify-content: space-between;
         }
 
         .form-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 12px;
             margin-bottom: 15px;
         }
@@ -84,6 +85,7 @@
             font-size: 0.9rem;
             outline: none;
             transition: border-color 0.2s;
+            width: 100%;
         }
 
         input:focus, select:focus { border-color: var(--accent); }
@@ -106,7 +108,8 @@
 
         .btn:hover { opacity: 0.9; transform: translateY(-1px); }
         .btn-success { background: #10b981; }
-        .btn-danger { background: #ef4444; padding: 6px 12px; font-size: 0.8rem; }
+        .btn-danger { background: #ef4444; padding: 6px 10px; font-size: 0.8rem; }
+        .btn-restore { background: #3b82f6; padding: 6px 10px; font-size: 0.8rem; }
 
         .top-bar {
             display: flex;
@@ -120,8 +123,37 @@
         .table-wrap { overflow-x: auto; }
 
         table { width: 100%; border-collapse: collapse; min-width: 650px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid rgba(255, 255, 255, 0.05); font-size: 0.9rem; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid rgba(255, 255, 255, 0.05); font-size: 0.9rem; }
         th { color: var(--text-sub); font-size: 0.8rem; text-transform: uppercase; }
+
+        /* OVERLAY MẬT KHẨU ADMIN */
+        #loginOverlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(3, 7, 18, 0.95);
+            backdrop-filter: blur(15px);
+            z-index: 99999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-box {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 30px;
+            width: 90%;
+            max-width: 380px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        }
+
+        .login-box i { font-size: 3rem; color: var(--accent); margin-bottom: 15px; }
+        .login-box h2 { margin: 0 0 10px 0; font-size: 1.5rem; }
+        .login-box p { color: var(--text-sub); font-size: 0.9rem; margin-bottom: 20px; }
+        .login-box input { margin-bottom: 15px; text-align: center; font-size: 1.1rem; letter-spacing: 3px; }
+        .login-box button { width: 100%; justify-content: center; }
 
         .status-toast {
             position: fixed;
@@ -136,16 +168,39 @@
             box-shadow: 0 10px 20px rgba(0,0,0,0.4);
             z-index: 99;
         }
+
+        .badge-count {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+        }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1><i class="fas fa-user-gear"></i> Trang Quản Lý Admin</h1>
+    <!-- OVERLAY ĐĂNG NHẬP ADMIN -->
+    <div id="loginOverlay">
+        <div class="login-box">
+            <i class="fas fa-user-shield"></i>
+            <h2>XÁC NHẬN ADMIN</h2>
+            <p>Vui lòng nhập mật khẩu quản trị để tiếp tục</p>
+            <input type="password" id="adminPasswordInput" placeholder="••••••••" onkeypress="handlePassKey(event)">
+            <button class="btn" onclick="checkPassword()"><i class="fas fa-key"></i> Đăng Nhập</button>
+        </div>
+    </div>
+
+    <!-- GIAO DIỆN QUẢN TRỊ ADMIN -->
+    <div class="container" id="adminContainer">
+        <div class="top-bar">
+            <h1><i class="fas fa-user-gear"></i> Trang Quản Lý Admin</h1>
+            <button class="btn btn-danger" onclick="logoutAdmin()"><i class="fas fa-right-from-bracket"></i> Đăng Xuất</button>
+        </div>
 
         <!-- CẤU HÌNH TIÊU ĐỀ TRANG WEB -->
         <div class="card">
-            <h2><i class="fas fa-heading"></i> Cấu Hình Tiêu Đề & Mô Tả Trang Web</h2>
+            <h2><span><i class="fas fa-heading"></i> Cấu Hình Tiêu Đề & Mô Tả Trang Web</span></h2>
             <div class="form-grid">
                 <div class="form-group full-width">
                     <label>Tiêu Đề Chính (H1)</label>
@@ -158,9 +213,9 @@
             </div>
         </div>
 
-        <!-- QUẢN LÝ DANH SÁCH EXECUTOR -->
+        <!-- THÊM EXECUTOR MỚI -->
         <div class="card">
-            <h2><i class="fas fa-plus-circle"></i> Thêm Executor Mới</h2>
+            <h2><span><i class="fas fa-plus-circle"></i> Thêm Executor Mới</span></h2>
             <div class="form-grid">
                 <div class="form-group">
                     <label>Tên Executor</label>
@@ -200,10 +255,10 @@
             <button class="btn" onclick="addExecutor()"><i class="fas fa-plus"></i> Thêm Vào Danh Sách</button>
         </div>
 
-        <!-- DANH SÁCH & NÚT LƯU -->
+        <!-- DANH SÁCH CHÍNH & LƯU -->
         <div class="card">
             <div class="top-bar">
-                <h2 style="border:none; margin:0; padding:0;"><i class="fas fa-list"></i> Danh Sách Executor Hiện Tại</h2>
+                <h2 style="border:none; margin:0; padding:0;"><span><i class="fas fa-list"></i> Danh Sách Executor Đang Hiển Thị</span></h2>
                 <button class="btn btn-success" onclick="saveAllData()"><i class="fas fa-cloud-arrow-up"></i> LƯU & ĐỒNG BỘ LÊN WEBSITES</button>
             </div>
 
@@ -217,11 +272,36 @@
                             <th>Giá</th>
                             <th>Cập nhật</th>
                             <th>Ghi chú</th>
-                            <th>Thao tác</th>
+                            <th>Xóa</th>
                         </tr>
                     </thead>
                     <tbody id="adminTableBody">
                         <!-- Render JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- THÙNG RÁC - KHÔI PHỤC EXECUTOR -->
+        <div class="card" style="border-color: rgba(239, 68, 68, 0.3);">
+            <h2>
+                <span><i class="fas fa-trash-can" style="color: #ef4444;"></i> Thùng Rác (Đã Xóa)</span>
+                <span id="trashCount" class="badge-count">0</span>
+            </h2>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tên</th>
+                            <th>Nền tảng</th>
+                            <th>Trạng thái</th>
+                            <th>Khôi phục</th>
+                            <th>Xóa hẳn</th>
+                        </tr>
+                    </thead>
+                    <tbody id="trashTableBody">
+                        <!-- Render JS Trash -->
                     </tbody>
                 </table>
             </div>
@@ -231,12 +311,45 @@
     <div id="toast" class="status-toast">Đã đồng bộ thành công!</div>
 
     <script>
+        // MẬT KHẨU MẶC ĐỊNH LÀ: 123456
+        const ADMIN_PASSWORD = "123456";
         const API_URL = "https://api.npoint.io/9d78b91f5a0f7c9f5ec8";
 
         let siteTitle = "Roblox Executors Status";
         let siteSubtitle = "Trạng thái cập nhật liên tục các Executor cho Windows, Android, iOS & Mac";
         let itemsList = [];
+        let trashList = [];
 
+        // 1. KIỂM TRA MẬT KHẨU
+        function checkPassword() {
+            const pwd = document.getElementById('adminPasswordInput').value;
+            if (pwd === ADMIN_PASSWORD) {
+                sessionStorage.setItem('admin_auth', 'true');
+                document.getElementById('loginOverlay').style.display = 'none';
+                document.getElementById('adminContainer').style.display = 'block';
+                loadAdminData();
+            } else {
+                alert("Mật khẩu không đúng! Vui lòng thử lại.");
+            }
+        }
+
+        function handlePassKey(e) {
+            if (e.key === 'Enter') checkPassword();
+        }
+
+        function logoutAdmin() {
+            sessionStorage.removeItem('admin_auth');
+            location.reload();
+        }
+
+        // Tự động vào nếu đã đăng nhập trong phiên làm việc
+        if (sessionStorage.getItem('admin_auth') === 'true') {
+            document.getElementById('loginOverlay').style.display = 'none';
+            document.getElementById('adminContainer').style.display = 'block';
+            loadAdminData();
+        }
+
+        // 2. TẢI DỮ LIỆU TỪ MÁY CHỦ
         async function loadAdminData() {
             try {
                 const res = await fetch(API_URL + "?t=" + new Date().getTime());
@@ -244,20 +357,24 @@
 
                 if (Array.isArray(data)) {
                     itemsList = data;
+                    trashList = [];
                 } else if (data && typeof data === 'object') {
                     siteTitle = data.title || siteTitle;
                     siteSubtitle = data.subtitle || siteSubtitle;
                     itemsList = Array.isArray(data.items) ? data.items : [];
+                    trashList = Array.isArray(data.trash) ? data.trash : [];
                 }
 
                 document.getElementById('siteTitleInput').value = siteTitle;
                 document.getElementById('siteSubtitleInput').value = siteSubtitle;
                 renderAdminTable();
+                renderTrashTable();
             } catch (err) {
                 console.error("Lỗi khi tải dữ liệu:", err);
             }
         }
 
+        // 3. RENDER BẢNG CHÍNH
         function renderAdminTable() {
             const tbody = document.getElementById('adminTableBody');
             if (itemsList.length === 0) {
@@ -287,7 +404,28 @@
                     <td><input type="text" value="${item.price || ''}" onchange="updateItem(${index}, 'price', this.value)"></td>
                     <td><input type="text" value="${item.time || ''}" onchange="updateItem(${index}, 'time', this.value)"></td>
                     <td><input type="text" value="${item.note || ''}" onchange="updateItem(${index}, 'note', this.value)"></td>
-                    <td><button class="btn btn-danger" onclick="deleteItem(${index})"><i class="fas fa-trash"></i></button></td>
+                    <td><button class="btn btn-danger" onclick="moveToTrash(${index})"><i class="fas fa-trash"></i></button></td>
+                </tr>
+            `).join('');
+        }
+
+        // 4. RENDER BẢNG THÙNG RÁC
+        function renderTrashTable() {
+            const tbody = document.getElementById('trashTableBody');
+            document.getElementById('trashCount').textContent = trashList.length;
+
+            if (trashList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color: var(--text-sub);">Thùng rác trống.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = trashList.map((item, index) => `
+                <tr>
+                    <td style="color: #fff; font-weight:600;">${item.name || ''}</td>
+                    <td>${item.plat || ''}</td>
+                    <td>${item.status || ''}</td>
+                    <td><button class="btn btn-restore" onclick="restoreFromTrash(${index})"><i class="fas fa-rotate-left"></i> Khôi phục</button></td>
+                    <td><button class="btn btn-danger" onclick="deletePermanently(${index})"><i class="fas fa-xmark"></i> Xóa vĩnh viễn</button></td>
                 </tr>
             `).join('');
         }
@@ -296,11 +434,31 @@
             itemsList[index][key] = value;
         }
 
-        function deleteItem(index) {
-            itemsList.splice(index, 1);
+        // CHUYỂN VÀO THÙNG RÁC
+        function moveToTrash(index) {
+            const deletedItem = itemsList.splice(index, 1)[0];
+            trashList.unshift(deletedItem);
             renderAdminTable();
+            renderTrashTable();
         }
 
+        // KHÔI PHỤC TỪ THÙNG RÁC
+        function restoreFromTrash(index) {
+            const restoredItem = trashList.splice(index, 1)[0];
+            itemsList.push(restoredItem);
+            renderAdminTable();
+            renderTrashTable();
+        }
+
+        // XÓA VĨNH VIỄN
+        function deletePermanently(index) {
+            if (confirm("Bạn có chắc muốn xóa vĩnh viễn Executor này không?")) {
+                trashList.splice(index, 1);
+                renderTrashTable();
+            }
+        }
+
+        // THÊM EXECUTOR
         function addExecutor() {
             const name = document.getElementById('addName').value.trim();
             if (!name) {
@@ -325,11 +483,13 @@
             renderAdminTable();
         }
 
+        // LƯU DỮ LIỆU LÊN SERVER
         async function saveAllData() {
             const payload = {
                 title: document.getElementById('siteTitleInput').value.trim() || "Roblox Executors Status",
                 subtitle: document.getElementById('siteSubtitleInput').value.trim() || "Trạng thái cập nhật liên tục các Executor",
-                items: itemsList
+                items: itemsList,
+                trash: trashList
             };
 
             try {
@@ -340,9 +500,9 @@
                 });
 
                 if (res.ok) {
-                    showToast("Đã lưu Tiêu đề & Danh sách lên máy chủ!");
+                    showToast("Đã đồng bộ Tiêu đề, Danh sách & Thùng rác!");
                 } else {
-                    alert("Lưu thất bại, thử lại sau!");
+                    alert("Lưu thất bại, vui lòng thử lại!");
                 }
             } catch (err) {
                 console.error(err);
@@ -356,8 +516,6 @@
             toast.style.display = 'block';
             setTimeout(() => toast.style.display = 'none', 2500);
         }
-
-        loadAdminData();
     </script>
 </body>
 </html>
