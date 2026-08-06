@@ -137,7 +137,7 @@
         th, td { padding: 12px 10px; text-align: left; border-bottom: 1px solid rgba(255, 255, 255, 0.04); font-size: 0.88rem; }
         th { color: var(--text-sub); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        /* OVERLAY CẢNH BÁO MỞ DEVTOOLS (TỰ ĐỘNG ẨN KHI TẮT CONSOLE) */
+        /* OVERLAY CẢNH BÁO BẢO MẬT (TỰ ĐỘNG HIỆN/ẨN KHI BẤM PHÍM HOẶC MỞ DEVTOOLS) */
         #devtoolsBlocker {
             display: none;
             position: fixed;
@@ -218,13 +218,13 @@
 </head>
 <body>
 
-    <!-- MÀN HÌNH KHI BẬT CONSOLE / INSPECT -->
+    <!-- MÀN HÌNH CẢNH BÁO KHI BẤM PHÍM TẮT BỊ CẤM / MỞ CONSOLE -->
     <div id="devtoolsBlocker">
         <i class="fas fa-triangle-exclamation" style="font-size: 4rem; margin-bottom: 20px;"></i>
         <h1 style="font-size: 2.2rem; margin-bottom: 10px; color: #ef4444; background: none; -webkit-text-fill-color: initial;">CẢNH BÁO BẢO MẬT ADMIN</h1>
         <p style="color: #94a3b8; max-width: 550px; font-size: 1.05rem; line-height: 1.6; margin: 0;">
-            Phát hiện thao tác mở DevTools / Console Soi Code!<br>
-            <span style="color: #a78bfa; font-weight: 600;">Vui lòng TẮT bảng DevTools để quay lại làm việc tự động.</span>
+            Phát hiện thao tác phím tắt bị cấm (Ctrl+S, F12, Ctrl+U,...) hoặc DevTools!<br>
+            <span style="color: #a78bfa; font-weight: 600;">Nhả phím / Tắt DevTools để quay lại trang làm việc tự động.</span>
         </p>
     </div>
 
@@ -336,38 +336,70 @@
 
     <script>
         // =========================================================
-        // HỆ THỐNG BẢO MẬT & KIỂM TRA DEVTOOLS TỰ ĐỘNG ĐÓNG/MỞ
+        // BẢO MẬT: BẤM PHÍM CẤM -> HIỆN CẢNH BÁO, NHẢ PHÍM -> TỰ TẮT
         // =========================================================
+        const blocker = document.getElementById('devtoolsBlocker');
+        let isKeyPressed = false;
+        let isDevToolsOpen = false;
+
+        function updateBlockerState() {
+            if (isKeyPressed || isDevToolsOpen) {
+                blocker.style.display = 'flex';
+            } else {
+                blocker.style.display = 'none';
+            }
+        }
+
+        // Chặn chuột phải, bôi đen văn bản, kéo rê phần tử
         document.addEventListener('contextmenu', e => e.preventDefault());
         document.addEventListener('selectstart', e => {
             if (!['INPUT', 'TEXTAREA'].includes(e.target.tagName)) e.preventDefault();
         });
         document.addEventListener('dragstart', e => e.preventDefault());
 
+        // Bắt sự kiện BẤM PHÍM TẮT -> HIỆN CẢNH BÁO
         document.addEventListener('keydown', e => {
-            if (
+            const ctrlOrCmd = e.ctrlKey || e.metaKey;
+            
+            // Danh sách các phím tắt bị cấm: F12, Ctrl+S, Ctrl+U, Ctrl+P, Ctrl+Shift+I/J/C/K/S
+            const isBlockedKey = 
                 e.key === 'F12' ||
-                (e.ctrlKey && e.shiftKey && ['I', 'i', 'J', 'j', 'C', 'c', 'K', 'k'].includes(e.key)) ||
-                (e.ctrlKey && ['U', 'u', 'S', 's', 'P', 'p'].includes(e.key))
-            ) {
+                (ctrlOrCmd && e.shiftKey && ['I', 'i', 'J', 'j', 'C', 'c', 'K', 'k', 'S', 's'].includes(e.key)) ||
+                (ctrlOrCmd && ['U', 'u', 'S', 's', 'P', 'p'].includes(e.key));
+
+            if (isBlockedKey) {
                 e.preventDefault();
                 e.stopPropagation();
+                isKeyPressed = true;
+                updateBlockerState();
                 return false;
             }
         });
 
-        // Bẫy Debugger liên tục: Mở DevTools -> Hiện Cảnh Báo; Tắt DevTools -> Tự Động Ẩn Cảnh Báo
-        const blocker = document.getElementById('devtoolsBlocker');
+        // Bắt sự kiện NHẢ PHÍM -> TỰ TẮT CẢNH BÁO
+        document.addEventListener('keyup', e => {
+            isKeyPressed = false;
+            updateBlockerState();
+        });
+
+        // Tự tắt cảnh báo khi rời cửa sổ trình duyệt (để tránh bị kẹt màn hình)
+        window.addEventListener('blur', () => {
+            isKeyPressed = false;
+            updateBlockerState();
+        });
+
+        // Bẫy Debugger phát hiện khi MỞ DEVTOOLS / CONSOLE
         setInterval(() => {
             const startTime = performance.now();
             debugger;
             const endTime = performance.now();
 
             if (endTime - startTime > 100) {
-                blocker.style.display = 'flex'; // DevTools đang mở -> Che màn hình
+                isDevToolsOpen = true;
             } else {
-                blocker.style.display = 'none'; // DevTools đã tắt -> Tự động khôi phục lại trang
+                isDevToolsOpen = false;
             }
+            updateBlockerState();
         }, 200);
 
         // =========================================================
