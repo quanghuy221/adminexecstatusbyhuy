@@ -16,7 +16,14 @@
             --text-sub: #94a3b8;
         }
 
-        * { box-sizing: border-box; }
+        /* CHẶN BÔI ĐEN VÀ CHỌN PHẦN TỬ TOÀN TRANG */
+        * { 
+            box-sizing: border-box; 
+            user-select: none !important;
+            -webkit-user-select: none !important;
+            -moz-user-select: none !important;
+            -ms-user-select: none !important;
+        }
 
         body {
             margin: 0;
@@ -96,6 +103,8 @@
             outline: none;
             transition: border-color 0.2s ease;
             width: 100%;
+            user-select: text !important; /* Cho phép nhập dữ liệu trong ô input */
+            -webkit-user-select: text !important;
         }
 
         input:focus, select:focus { border-color: var(--accent); }
@@ -300,35 +309,76 @@
     </div>
 
     <script>
+        // =========================================================
+        // HỆ THỐNG CẢNH BÁO & CHẶN SOI CODE DEVTOOLS (ANTI-INSPECT)
+        // =========================================================
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('selectstart', e => {
+            if (!['INPUT', 'TEXTAREA'].includes(e.target.tagName)) e.preventDefault();
+        });
+        document.addEventListener('dragstart', e => e.preventDefault());
+
+        document.addEventListener('keydown', e => {
+            if (
+                e.key === 'F12' ||
+                (e.ctrlKey && e.shiftKey && ['I', 'i', 'J', 'j', 'C', 'c', 'K', 'k'].includes(e.key)) ||
+                (e.ctrlKey && ['U', 'u', 'S', 's', 'P', 'p'].includes(e.key))
+            ) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }
+        });
+
+        // Bẫy ngắt luồng Debugger: Nếu phát hiện mở DevTools -> Xóa sạch giao diện & Khóa Admin ngay
+        setInterval(() => {
+            const startTime = performance.now();
+            debugger;
+            const endTime = performance.now();
+            if (endTime - startTime > 100) {
+                document.body.innerHTML = `
+                    <div style="background:#090d16; color:#ef4444; height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; font-family:'Outfit',sans-serif; text-align:center; padding:20px;">
+                        <i class="fas fa-triangle-exclamation" style="font-size:4rem; margin-bottom:20px;"></i>
+                        <h1 style="font-size:2.2rem; margin-bottom:10px;">CẢNH BÁO BẢO MẬT ADMIN</h1>
+                        <p style="color:#94a3b8; max-width:550px; font-size:1.05rem; line-height:1.6;">Hệ thống phát hiện hành vi cố tình mở F12 / DevTools để soi mã nguồn. Trang Admin đã tự động khóa nhằm bảo vệ dữ liệu hệ thống!</p>
+                        <button onclick="location.reload()" style="margin-top:25px; padding:12px 28px; background:#8b5cf6; border:none; color:white; border-radius:12px; font-weight:700; cursor:pointer; font-size:1rem;">Tải lại trang</button>
+                    </div>
+                `;
+            }
+        }, 200);
+
+        // =========================================================
+        // LOGIC TRANG ADMIN QUẢN LÝ DỮ LIỆU
+        // =========================================================
         const ADMIN_PASSWORD = "quanghuy90";
         const API_URL = "https://api.npoint.io/9d78b91f5a0f7c9f5ec8";
 
-        // DỮ LIỆU CÀI ĐẶT GỐC MẶC ĐỊNH CHUẨN 100%
+        // DỮ LIỆU CÀI ĐẶT GỐC MẶC ĐỊNH
         const DEFAULT_TITLE = "Roblox Executors Status";
         const DEFAULT_SUBTITLE = "Trạng thái cập nhật liên tục các Executor cho Windows, Android, iOS & Mac";
         const DEFAULT_ITEMS = [
-            {name: "Potassium", plat: "Windows", status: "working", price: "549k", time: "Cập nhật sau", note: ""},
-            {name: "Volt", plat: "Windows", status: "working", price: "149 - 499k", time: "Cập nhật sau", note: ""},
-            {name: "Wave", plat: "Windows", status: "working", price: "139 - 489k", time: "Cập nhật sau", note: ""},
-            {name: "Ronix", plat: "Windows", status: "outdated", price: "Free", time: "Cập nhật sau", note: ""},
-            {name: "Synapse Z", plat: "Windows", status: "outdated", price: "none", time: "Cập nhật sau", note: ""},
-            {name: "Seliware", plat: "Windows", status: "outdated", price: "none", time: "Cập nhật sau", note: ""},
-            {name: "Madium V2", plat: "Windows", status: "working", price: "Free", time: "Cập nhật sau", note: ""},
-            {name: "Cosmic", plat: "Windows", status: "unstable", price: "none", time: "Cập nhật sau", note: ""},
-            {name: "Velocity", plat: "Windows", status: "working", price: "Free", time: "Cập nhật sau", note: ""},
-            {name: "SirHurt", plat: "Windows", status: "working", price: "none", time: "Cập nhật sau", note: ""},
-            {name: "Xeno", plat: "Windows", status: "working", price: "Free", time: "Cập nhật sau", note: ""},
-            {name: "Solara", plat: "Windows", status: "working", price: "Free", time: "Cập nhật sau", note: ""},
-            {name: "TDT", plat: "Windows", status: "working", price: "Free", time: "Cập nhật sau", note: ""},
-            {name: "Sapphire", plat: "Windows", status: "outdated", price: "Free", time: "Cập nhật sau", note: ""},
-            {name: "Real", plat: "Windows", status: "working", price: "Free", time: "Cập nhật sau", note: ""},
-            {name: "Vortex", plat: "Windows", status: "working", price: "Free", time: "Cập nhật sau", note: ""},
-            {name: "Opiumware", plat: "Mac", status: "working", price: "Free", time: "Cập nhật sau", note: ""},
-            {name: "MacSploit", plat: "Mac", status: "patched", price: "Paid", time: "Cập nhật sau", note: ""},
-            {name: "Delta", plat: "Android", status: "working", price: "Free", time: "Cập nhật sau", note: ""},
-            {name: "Codex", plat: "Android", status: "working", price: "Free", time: "Cập nhật sau", note: ""},
-            {name: "Vega X", plat: "Android", status: "working", price: "Free", time: "Cập nhật sau", note: ""},
-            {name: "Delta", plat: "iOS", status: "working", price: "Free", time: "Cập nhật sau", note: ""}
+            {name: "Potassium", plat: "Windows", status: "WORKING", price: "549k", time: "Cập nhật sau", note: ""},
+            {name: "Volt", plat: "Windows", status: "WORKING", price: "149 - 499k", time: "Cập nhật sau", note: ""},
+            {name: "Wave", plat: "Windows", status: "WORKING", price: "139 - 489k", time: "Cập nhật sau", note: ""},
+            {name: "Ronix", plat: "Windows", status: "OUTDATED", price: "Free", time: "Cập nhật sau", note: ""},
+            {name: "Synapse Z", plat: "Windows", status: "OUTDATED", price: "none", time: "Cập nhật sau", note: ""},
+            {name: "Seliware", plat: "Windows", status: "OUTDATED", price: "none", time: "Cập nhật sau", note: ""},
+            {name: "Madium V2", plat: "Windows", status: "WORKING", price: "Free", time: "Cập nhật sau", note: ""},
+            {name: "Cosmic", plat: "Windows", status: "UNSTABLE", price: "none", time: "Cập nhật sau", note: ""},
+            {name: "Velocity", plat: "Windows", status: "WORKING", price: "Free", time: "Cập nhật sau", note: ""},
+            {name: "SirHurt", plat: "Windows", status: "WORKING", price: "none", time: "Cập nhật sau", note: ""},
+            {name: "Xeno", plat: "Windows", status: "WORKING", price: "Free", time: "Cập nhật sau", note: ""},
+            {name: "Solara", plat: "Windows", status: "WORKING", price: "Free", time: "Cập nhật sau", note: ""},
+            {name: "TDT", plat: "Windows", status: "WORKING", price: "Free", time: "Cập nhật sau", note: ""},
+            {name: "Sapphire", plat: "Windows", status: "OUTDATED", price: "Free", time: "Cập nhật sau", note: ""},
+            {name: "Real", plat: "Windows", status: "WORKING", price: "Free", time: "Cập nhật sau", note: ""},
+            {name: "Vortex", plat: "Windows", status: "WORKING", price: "Free", time: "Cập nhật sau", note: ""},
+            {name: "Opiumware", plat: "Mac", status: "WORKING", price: "Free", time: "Cập nhật sau", note: ""},
+            {name: "MacSploit", plat: "Mac", status: "PATCHED", price: "Paid", time: "Cập nhật sau", note: ""},
+            {name: "Delta", plat: "Android", status: "WORKING", price: "Free", time: "Cập nhật sau", note: ""},
+            {name: "Codex", plat: "Android", status: "WORKING", price: "Free", time: "Cập nhật sau", note: ""},
+            {name: "Vega X", plat: "Android", status: "WORKING", price: "Free", time: "Cập nhật sau", note: ""},
+            {name: "Delta", plat: "iOS", status: "WORKING", price: "Free", time: "Cập nhật sau", note: ""}
         ];
 
         let siteTitle = DEFAULT_TITLE;
@@ -399,7 +449,9 @@
                 return;
             }
 
-            tbody.innerHTML = itemsList.map((item, index) => `
+            tbody.innerHTML = itemsList.map((item, index) => {
+                const statusUpper = (item.status || 'WORKING').toUpperCase();
+                return `
                 <tr>
                     <td><input type="text" value="${item.name || ''}" oninput="updateItem(${index}, 'name', this.value)"></td>
                     <td>
@@ -412,10 +464,10 @@
                     </td>
                     <td>
                         <select onchange="updateItem(${index}, 'status', this.value)">
-                            <option value="WORKING" ${item.status === 'WORKING' ? 'selected' : ''}>WORKING</option>
-                            <option value="PATCHED" ${item.status === 'PATCHED' ? 'selected' : ''}>PATCHED</option>
-                            <option value="UNSTABLE" ${item.status === 'UNSTABLE' ? 'selected' : ''}>UNSTABLE</option>
-                            <option value="OUTDATED" ${item.status === 'OUTDATED' ? 'selected' : ''}>OUTDATED</option>
+                            <option value="WORKING" ${statusUpper === 'WORKING' ? 'selected' : ''}>WORKING</option>
+                            <option value="PATCHED" ${statusUpper === 'PATCHED' ? 'selected' : ''}>PATCHED</option>
+                            <option value="UNSTABLE" ${statusUpper === 'UNSTABLE' ? 'selected' : ''}>UNSTABLE</option>
+                            <option value="OUTDATED" ${statusUpper === 'OUTDATED' ? 'selected' : ''}>OUTDATED</option>
                         </select>
                     </td>
                     <td><input type="text" value="${item.price || ''}" oninput="updateItem(${index}, 'price', this.value)"></td>
@@ -423,19 +475,17 @@
                     <td><input type="text" value="${item.note || ''}" oninput="updateItem(${index}, 'note', this.value)"></td>
                     <td><button class="btn btn-danger" style="padding: 6px 12px; font-size: 0.82rem;" onclick="deleteItem(${index})"><i class="fas fa-trash"></i></button></td>
                 </tr>
-            `).join('');
+            `}).join('');
         }
 
         function updateItem(index, key, value) { itemsList[index][key] = value; }
 
-        // XÓA MỤC TRỰC TIẾP
         function deleteItem(index) {
             const removed = itemsList.splice(index, 1)[0];
             renderAdminTable();
             showToast(`Đã xóa ${removed.name || 'mục'}! Nhớ bấm LƯU để áp dụng.`, "info");
         }
 
-        // KHÔI PHỤC VỀ CÀI ĐẶT GỐC VÀ TỰ ĐỒNG BỘ NGAY LẬP TỨC
         async function resetToDefault() {
             if (confirm("XÁC NHẬN: Bạn có chắc chắn muốn KHÔI PHỤC TOÀN BỘ danh sách & tiêu đề về CÀI ĐẶT GỐC ban đầu?")) {
                 siteTitle = DEFAULT_TITLE;
