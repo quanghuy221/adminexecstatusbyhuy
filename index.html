@@ -137,6 +137,22 @@
         th, td { padding: 12px 10px; text-align: left; border-bottom: 1px solid rgba(255, 255, 255, 0.04); font-size: 0.88rem; }
         th { color: var(--text-sub); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; }
 
+        /* OVERLAY CẢNH BÁO MỞ DEVTOOLS (TỰ ĐỘNG ẨN KHI TẮT CONSOLE) */
+        #devtoolsBlocker {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #090d16;
+            color: #ef4444;
+            z-index: 9999999;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Outfit', sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+
         /* OVERLAY ĐĂNG NHẬP */
         #loginOverlay {
             position: fixed;
@@ -201,6 +217,16 @@
     </style>
 </head>
 <body>
+
+    <!-- MÀN HÌNH KHI BẬT CONSOLE / INSPECT -->
+    <div id="devtoolsBlocker">
+        <i class="fas fa-triangle-exclamation" style="font-size: 4rem; margin-bottom: 20px;"></i>
+        <h1 style="font-size: 2.2rem; margin-bottom: 10px; color: #ef4444; background: none; -webkit-text-fill-color: initial;">CẢNH BÁO BẢO MẬT ADMIN</h1>
+        <p style="color: #94a3b8; max-width: 550px; font-size: 1.05rem; line-height: 1.6; margin: 0;">
+            Phát hiện thao tác mở DevTools / Console Soi Code!<br>
+            <span style="color: #a78bfa; font-weight: 600;">Vui lòng TẮT bảng DevTools để quay lại làm việc tự động.</span>
+        </p>
+    </div>
 
     <div id="toastContainer"></div>
 
@@ -310,7 +336,7 @@
 
     <script>
         // =========================================================
-        // HỆ THỐNG CẢNH BÁO & CHẶN SOI CODE DEVTOOLS (ANTI-INSPECT)
+        // HỆ THỐNG BẢO MẬT & KIỂM TRA DEVTOOLS TỰ ĐỘNG ĐÓNG/MỞ
         // =========================================================
         document.addEventListener('contextmenu', e => e.preventDefault());
         document.addEventListener('selectstart', e => {
@@ -330,20 +356,17 @@
             }
         });
 
-        // Bẫy ngắt luồng Debugger: Nếu phát hiện mở DevTools -> Xóa sạch giao diện & Khóa Admin ngay
+        // Bẫy Debugger liên tục: Mở DevTools -> Hiện Cảnh Báo; Tắt DevTools -> Tự Động Ẩn Cảnh Báo
+        const blocker = document.getElementById('devtoolsBlocker');
         setInterval(() => {
             const startTime = performance.now();
             debugger;
             const endTime = performance.now();
+
             if (endTime - startTime > 100) {
-                document.body.innerHTML = `
-                    <div style="background:#090d16; color:#ef4444; height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; font-family:'Outfit',sans-serif; text-align:center; padding:20px;">
-                        <i class="fas fa-triangle-exclamation" style="font-size:4rem; margin-bottom:20px;"></i>
-                        <h1 style="font-size:2.2rem; margin-bottom:10px;">CẢNH BÁO BẢO MẬT ADMIN</h1>
-                        <p style="color:#94a3b8; max-width:550px; font-size:1.05rem; line-height:1.6;">Hệ thống phát hiện hành vi cố tình mở F12 / DevTools để soi mã nguồn. Trang Admin đã tự động khóa nhằm bảo vệ dữ liệu hệ thống!</p>
-                        <button onclick="location.reload()" style="margin-top:25px; padding:12px 28px; background:#8b5cf6; border:none; color:white; border-radius:12px; font-weight:700; cursor:pointer; font-size:1rem;">Tải lại trang</button>
-                    </div>
-                `;
+                blocker.style.display = 'flex'; // DevTools đang mở -> Che màn hình
+            } else {
+                blocker.style.display = 'none'; // DevTools đã tắt -> Tự động khôi phục lại trang
             }
         }, 200);
 
@@ -353,7 +376,6 @@
         const ADMIN_PASSWORD = "quanghuy90";
         const API_URL = "https://api.npoint.io/9d78b91f5a0f7c9f5ec8";
 
-        // DỮ LIỆU CÀI ĐẶT GỐC MẶC ĐỊNH
         const DEFAULT_TITLE = "Roblox Executors Status";
         const DEFAULT_SUBTITLE = "Trạng thái cập nhật liên tục các Executor cho Windows, Android, iOS & Mac";
         const DEFAULT_ITEMS = [
