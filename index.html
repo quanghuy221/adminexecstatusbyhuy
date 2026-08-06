@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Huy Dep Trai</title>
+    <title>Admin Dashboard - Roblox Executors</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -111,6 +111,8 @@
         .btn:hover { opacity: 0.92; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(139, 92, 246, 0.4); }
         .btn-success { background: #10b981; }
         .btn-success:hover { box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4); }
+        .btn-warning { background: #f59e0b; color: #000; font-weight: 700; }
+        .btn-warning:hover { box-shadow: 0 5px 15px rgba(245, 158, 11, 0.4); }
         .btn-danger { background: #ef4444; padding: 7px 12px; font-size: 0.82rem; }
         .btn-restore { background: #3b82f6; padding: 7px 12px; font-size: 0.82rem; }
 
@@ -153,7 +155,6 @@
             transition: transform 0.2s ease;
         }
 
-        /* ANIMATION RUNG KHI SAI MẬT KHẨU */
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             20%, 60% { transform: translateX(-12px); }
@@ -202,6 +203,7 @@
         .toast-success { background: rgba(16, 185, 129, 0.9); border-color: rgba(16, 185, 129, 0.4); }
         .toast-error { background: rgba(239, 68, 68, 0.9); border-color: rgba(239, 68, 68, 0.4); }
         .toast-info { background: rgba(139, 92, 246, 0.9); border-color: rgba(139, 92, 246, 0.4); }
+        .toast-warning { background: rgba(245, 158, 11, 0.9); color: #000; border-color: rgba(245, 158, 11, 0.4); }
 
         .badge-count {
             background: rgba(239, 68, 68, 0.2);
@@ -214,10 +216,9 @@
 </head>
 <body>
 
-    <!-- THÙNG THÔNG BÁO GÓC DƯỚI BÊN PHẢI -->
     <div id="toastContainer"></div>
 
-    <!-- OVERLAY ĐĂNG NHẬP ADMIN -->
+    <!-- OVERLAY ĐĂNG NHẬP -->
     <div id="loginOverlay">
         <div class="login-box" id="loginBox">
             <i class="fas fa-user-shield main-icon"></i>
@@ -228,31 +229,35 @@
         </div>
     </div>
 
-    <!-- GIAO DIỆN QUẢN TRỊ ADMIN -->
+    <!-- GIAO DIỆN CHÍNH -->
     <div class="container" id="adminContainer">
         <div class="top-bar">
             <h1><i class="fas fa-user-gear"></i> Trang Quản Lý Admin</h1>
-            <button class="btn btn-danger" onclick="logoutAdmin()"><i class="fas fa-right-from-bracket"></i> Đăng Xuất</button>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <!-- NÚT KHÔI PHỤC RIÊNG BẤM LỠ XÓA VĨNH VIỄN -->
+                <button class="btn btn-warning" onclick="restorePermanentlyDeleted()"><i class="fas fa-life-ring"></i> KHÔI PHỤC MỤC XÓA NHẦM</button>
+                <button class="btn btn-danger" onclick="logoutAdmin()"><i class="fas fa-right-from-bracket"></i> Đăng Xuất</button>
+            </div>
         </div>
 
-        <!-- CẤU HÌNH TIÊU ĐỀ TRANG WEB -->
+        <!-- CẤU HÌNH TIÊU ĐỀ -->
         <div class="card">
             <h2><span><i class="fas fa-heading"></i> Cấu Hình Tiêu Đề & Mô Tả Trang Web</span></h2>
             <div class="form-grid">
                 <div class="form-group full-width">
                     <label>Tiêu Đề Chính (H1)</label>
-                    <input type="text" id="siteTitleInput" placeholder="Ví dụ: Roblox Executors Status" onchange="markUnsaved()">
+                    <input type="text" id="siteTitleInput" placeholder="Ví dụ: Roblox Executors Status">
                 </div>
                 <div class="form-group full-width">
                     <label>Dòng Mô Tả Phụ (Subtitle)</label>
-                    <input type="text" id="siteSubtitleInput" placeholder="Ví dụ: Trạng thái cập nhật liên tục các Executor..." onchange="markUnsaved()">
+                    <input type="text" id="siteSubtitleInput" placeholder="Ví dụ: Trạng thái cập nhật liên tục...">
                 </div>
             </div>
         </div>
 
-        <!-- THÊM EXECUTOR MỚI -->
+        <!-- THÊM MỚI -->
         <div class="card">
-            <h2><span><i class="fas fa-plus-circle"></i> Thêm Executor Mới (Vào Hàng Chờ)</span></h2>
+            <h2><span><i class="fas fa-plus-circle"></i> Thêm Executor Mới</span></h2>
             <div class="form-grid">
                 <div class="form-group">
                     <label>Tên Executor</label>
@@ -292,7 +297,7 @@
             <button class="btn" onclick="addExecutor()"><i class="fas fa-plus"></i> Thêm Vào Bảng Trực Tiếp</button>
         </div>
 
-        <!-- DANH SÁCH CHÍNH & LƯU TẤT CẢ -->
+        <!-- BẢNG CHÍNH & NÚT LƯU ĐỒNG BỘ -->
         <div class="card">
             <div class="top-bar">
                 <h2 style="border:none; margin:0; padding:0;"><span><i class="fas fa-list"></i> Danh Sách Executor Đang Hiển Thị</span></h2>
@@ -312,14 +317,12 @@
                             <th>Xóa</th>
                         </tr>
                     </thead>
-                    <tbody id="adminTableBody">
-                        <!-- Render JS -->
-                    </tbody>
+                    <tbody id="adminTableBody"></tbody>
                 </table>
             </div>
         </div>
 
-        <!-- THÙNG RÁC - KHÔI PHỤC EXECUTOR -->
+        <!-- THÙNG RÁC -->
         <div class="card" style="border-color: rgba(239, 68, 68, 0.3);">
             <h2>
                 <span><i class="fas fa-trash-can" style="color: #ef4444;"></i> Thùng Rác (Đã Xóa Tạm)</span>
@@ -337,16 +340,13 @@
                             <th>Xóa hẳn</th>
                         </tr>
                     </thead>
-                    <tbody id="trashTableBody">
-                        <!-- Render JS Trash -->
-                    </tbody>
+                    <tbody id="trashTableBody"></tbody>
                 </table>
             </div>
         </div>
     </div>
 
     <script>
-        // MẬT KHẨU CHÍNH THỨC: quanghuy90
         const ADMIN_PASSWORD = "quanghuy90";
         const API_URL = "https://api.npoint.io/9d78b91f5a0f7c9f5ec8";
 
@@ -354,8 +354,10 @@
         let siteSubtitle = "Trạng thái cập nhật liên tục các Executor cho Windows, Android, iOS & Mac";
         let itemsList = [];
         let trashList = [];
+        
+        // BỘ NHỚ ĐỆM DÀNH CHO NÚT "KHÔI PHỤC MỤC XÓA NHẦM"
+        let permanentlyDeletedBackup = [];
 
-        // 1. HÀM HIỂN THỊ TOAST THÔNG BÁO BÊN PHẢI MÀN HÌNH
         function showToast(message, type = 'success') {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
@@ -364,19 +366,18 @@
             let icon = 'fa-circle-check';
             if (type === 'error') icon = 'fa-circle-xmark';
             if (type === 'info') icon = 'fa-circle-info';
+            if (type === 'warning') icon = 'fa-triangle-exclamation';
 
             toast.innerHTML = `<i class="fas ${icon}" style="font-size: 1.2rem;"></i> <span>${message}</span>`;
             container.appendChild(toast);
 
             setTimeout(() => toast.classList.add('show'), 10);
-
             setTimeout(() => {
                 toast.classList.remove('show');
                 setTimeout(() => toast.remove(), 400);
-            }, 3000);
+            }, 3200);
         }
 
-        // 2. KIỂM TRA MẬT KHẨU
         function checkPassword() {
             const pwd = document.getElementById('adminPasswordInput').value;
             const loginBox = document.getElementById('loginBox');
@@ -394,14 +395,8 @@
             }
         }
 
-        function handlePassKey(e) {
-            if (e.key === 'Enter') checkPassword();
-        }
-
-        function logoutAdmin() {
-            sessionStorage.removeItem('admin_auth');
-            location.reload();
-        }
+        function handlePassKey(e) { if (e.key === 'Enter') checkPassword(); }
+        function logoutAdmin() { sessionStorage.removeItem('admin_auth'); location.reload(); }
 
         if (sessionStorage.getItem('admin_auth') === 'true') {
             document.getElementById('loginOverlay').style.display = 'none';
@@ -409,7 +404,6 @@
             loadAdminData();
         }
 
-        // 3. TẢI DỮ LIỆU TỪ NPOINT
         async function loadAdminData() {
             try {
                 const res = await fetch(API_URL + "?t=" + new Date().getTime());
@@ -435,7 +429,6 @@
             }
         }
 
-        // 4. RENDER BẢNG CHÍNH (CHỈ CHỈNH SỬA TẠM TRÊN BỘ NHỚ)
         function renderAdminTable() {
             const tbody = document.getElementById('adminTableBody');
             if (itemsList.length === 0) {
@@ -470,7 +463,6 @@
             `).join('');
         }
 
-        // 5. RENDER BẢNG THÙNG RÁC
         function renderTrashTable() {
             const tbody = document.getElementById('trashTableBody');
             document.getElementById('trashCount').textContent = trashList.length;
@@ -491,16 +483,14 @@
             `).join('');
         }
 
-        function updateItem(index, key, value) {
-            itemsList[index][key] = value;
-        }
+        function updateItem(index, key, value) { itemsList[index][key] = value; }
 
         function moveToTrash(index) {
             const deletedItem = itemsList.splice(index, 1)[0];
             trashList.unshift(deletedItem);
             renderAdminTable();
             renderTrashTable();
-            showToast("Đã chuyển vào Thùng rác (Bấm Lưu để áp dụng)", "info");
+            showToast("Đã chuyển vào Thùng rác (Bấm LƯU để áp dụng)", "info");
         }
 
         function restoreFromTrash(index) {
@@ -508,15 +498,29 @@
             itemsList.push(restoredItem);
             renderAdminTable();
             renderTrashTable();
-            showToast("Đã khôi phục Executor (Bấm Lưu để áp dụng)", "info");
+            showToast("Đã khôi phục lại bảng chính (Bấm LƯU để áp dụng)", "info");
         }
 
+        // KHI BẤM XÓA VĨNH VIỄN, LƯU VÀO CẢ BỘ NHỚ CỨU HỘ
         function deletePermanently(index) {
-            if (confirm("Bạn có chắc muốn xóa vĩnh viễn Executor này không?")) {
-                trashList.splice(index, 1);
-                renderTrashTable();
-                showToast("Đã xóa vĩnh viễn (Bấm Lưu để áp dụng)", "info");
+            const item = trashList.splice(index, 1)[0];
+            permanentlyDeletedBackup.push(item); // Lưu dự phòng
+            renderTrashTable();
+            showToast(`Đã xóa "${item.name}". Lỡ tay? Bấm nút 'KHÔI PHỤC MỤC XÓA NHẦM' ở trên!`, "warning");
+        }
+
+        // NÚT KHÔI PHỤC DÀNH RIÊNG KHI LỠ XÓA NHẦM
+        function restorePermanentlyDeleted() {
+            if (permanentlyDeletedBackup.length === 0) {
+                showToast("Không có mục nào vừa bị xóa nhầm!", "info");
+                return;
             }
+
+            const count = permanentlyDeletedBackup.length;
+            itemsList.push(...permanentlyDeletedBackup);
+            permanentlyDeletedBackup = []; // Cứu xong thì dọn bộ nhớ đệm
+            renderAdminTable();
+            showToast(`Đã khôi phục ${count} mục xóa nhầm về Bảng chính! (Nhớ bấm LƯU)`, "success");
         }
 
         function addExecutor() {
@@ -541,10 +545,10 @@
             document.getElementById('addNote').value = '';
 
             renderAdminTable();
-            showToast(`Đã thêm "${name}" (Bấm LƯU & ĐỒNG BỘ để cập nhật web)`, "info");
+            showToast(`Đã thêm "${name}" vào bảng chờ (Bấm LƯU & ĐỒNG BỘ để áp dụng)`, "info");
         }
 
-        // 6. HÀM ĐỒNG BỘ TOÀN BỘ 1 LẦN DUY NHẤT LÊN MÁY CHỦ
+        // LƯU 1 LẦN DUY NHẤT LÊN MÁY CHỦ
         async function saveAllData() {
             const payload = {
                 title: document.getElementById('siteTitleInput').value.trim() || "Roblox Executors Status",
@@ -553,7 +557,7 @@
                 trash: trashList
             };
 
-            showToast("Đang đồng bộ dữ liệu...", "info");
+            showToast("Đang gửi dữ liệu lên máy chủ...", "info");
 
             try {
                 const res = await fetch(API_URL, {
@@ -563,9 +567,9 @@
                 });
 
                 if (res.ok) {
-                    showToast("ĐÃ ĐỒNG BỘ TẤT CẢ THAY ĐỔI THÀNH CÔNG!", "success");
+                    showToast("ĐÃ ĐỒNG BỘ THÀNH CÔNG LÊN WEBSITES!", "success");
                 } else {
-                    showToast("Lưu thất bại! Thử lại sau.", "error");
+                    showToast("Lưu thất bại!", "error");
                 }
             } catch (err) {
                 console.error(err);
