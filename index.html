@@ -158,7 +158,7 @@
         .login-box input { margin-bottom: 16px; text-align: center; font-size: 1.1rem; letter-spacing: 3px; }
         .login-box button { width: 100%; justify-content: center; padding: 12px; font-size: 0.95rem; }
 
-        /* TOAST */
+        /* TOAST NOTIFICATION */
         #toastContainer {
             position: fixed;
             bottom: 20px;
@@ -220,7 +220,8 @@
         <div class="top-bar">
             <h1><i class="fas fa-user-gear"></i> Trang Quản Lý Admin</h1>
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <button class="btn btn-warning" onclick="restorePermanentlyDeleted()"><i class="fas fa-life-ring"></i> KHÔI PHỤC MỤC XÓA NHẦM</button>
+                <!-- NÚT KHÔI PHỤC CÀI ĐẶT GỐC -->
+                <button class="btn btn-warning" onclick="resetToDefault()"><i class="fas fa-rotate-left"></i> KHÔI PHỤC CÀI ĐẶT GỐC</button>
                 <button class="btn btn-danger" onclick="logoutAdmin()"><i class="fas fa-right-from-bracket"></i> Đăng Xuất</button>
             </div>
         </div>
@@ -335,11 +336,27 @@
         const ADMIN_PASSWORD = "quanghuy90";
         const API_URL = "https://api.npoint.io/9d78b91f5a0f7c9f5ec8";
 
-        let siteTitle = "Roblox Executors Status";
-        let siteSubtitle = "Trạng thái cập nhật liên tục các Executor cho Windows, Android, iOS & Mac";
+        // DỮ LIỆU CÀI ĐẶT GỐC MẶC ĐỊNH
+        const DEFAULT_TITLE = "Roblox Executors Status";
+        const DEFAULT_SUBTITLE = "Trạng thái cập nhật liên tục các Executor cho Windows, Android, iOS & Mac";
+        const DEFAULT_ITEMS = [
+            { name: "Velocity", plat: "Windows", status: "WORKING", price: "Free", time: "Cập nhật sau", note: "-" },
+            { name: "SirHurt", plat: "Windows", status: "WORKING", price: "none", time: "Cập nhật sau", note: "-" },
+            { name: "Xeno", plat: "Windows", status: "WORKING", price: "Free", time: "Cập nhật sau", note: "-" },
+            { name: "Potassium", plat: "Windows", status: "WORKING", price: "549k", time: "Cập nhật sau", note: "-" },
+            { name: "Volt", plat: "Windows", status: "WORKING", price: "149 - 499k", time: "Cập nhật sau", note: "-" },
+            { name: "Wave", plat: "Windows", status: "WORKING", price: "139 - 489k", time: "Cập nhật sau", note: "-" },
+            { name: "Ronix", plat: "Windows", status: "OUTDATED", price: "Free", time: "Cập nhật sau", note: "-" },
+            { name: "Synapse Z", plat: "Windows", status: "OUTDATED", price: "none", time: "Cập nhật sau", note: "-" },
+            { name: "Seliware", plat: "Windows", status: "OUTDATED", price: "none", time: "Cập nhật sau", note: "-" },
+            { name: "Madium V2", plat: "Windows", status: "WORKING", price: "Free", time: "Cập nhật sau", note: "-" },
+            { name: "Cosmic", plat: "Windows", status: "UNSTABLE", price: "none", time: "Cập nhật sau", note: "-" }
+        ];
+
+        let siteTitle = DEFAULT_TITLE;
+        let siteSubtitle = DEFAULT_SUBTITLE;
         let itemsList = [];
         let trashList = [];
-        let permanentlyDeletedBackup = [];
 
         function showToast(message, type = 'success') {
             const container = document.getElementById('toastContainer');
@@ -474,22 +491,26 @@
         }
 
         function deletePermanently(index) {
-            const item = trashList.splice(index, 1)[0];
-            permanentlyDeletedBackup.push(item);
+            trashList.splice(index, 1);
             renderTrashTable();
-            showToast(`Đã xóa vĩnh viễn "${item.name}". Lỡ tay? Bấm nút Khôi phục ở trên!`, "warning");
+            showToast("Đã xóa vĩnh viễn!", "info");
         }
 
-        function restorePermanentlyDeleted() {
-            if (permanentlyDeletedBackup.length === 0) {
-                showToast("Không có mục nào vừa bị xóa nhầm!", "info");
-                return;
+        // HÀM KHÔI PHỤC TOÀN BỘ VỀ CÀI ĐẶT GỐC
+        function resetToDefault() {
+            if (confirm("Bạn có chắc chắn muốn KHÔI PHỤC TOÀN BỘ Tiêu đề, Mô tả và Danh sách về CÀI ĐẶT GỐC ban đầu?")) {
+                siteTitle = DEFAULT_TITLE;
+                siteSubtitle = DEFAULT_SUBTITLE;
+                itemsList = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
+                trashList = [];
+
+                document.getElementById('siteTitleInput').value = siteTitle;
+                document.getElementById('siteSubtitleInput').value = siteSubtitle;
+
+                renderAdminTable();
+                renderTrashTable();
+                showToast("Đã khôi phục Cài đặt gốc! Bấm 'LƯU & ĐỒNG BỘ' để áp dụng.", "warning");
             }
-            const count = permanentlyDeletedBackup.length;
-            itemsList.push(...permanentlyDeletedBackup);
-            permanentlyDeletedBackup = [];
-            renderAdminTable();
-            showToast(`Đã khôi phục ${count} mục xóa nhầm! (Bấm LƯU & ĐỒNG BỘ)`, "success");
         }
 
         function addExecutor() {
@@ -505,7 +526,7 @@
                 status: document.getElementById('addStatus').value,
                 price: document.getElementById('addPrice').value.trim() || 'Free',
                 time: document.getElementById('addTime').value.trim() || 'Vừa xong',
-                note: document.getElementById('addNote').value.trim() || ''
+                note: document.getElementById('addNote').value.trim() || '-'
             });
 
             document.getElementById('addName').value = '';
@@ -519,8 +540,8 @@
 
         async function saveAllData() {
             const payload = {
-                title: document.getElementById('siteTitleInput').value.trim() || "Roblox Executors Status",
-                subtitle: document.getElementById('siteSubtitleInput').value.trim() || "Trạng thái cập nhật liên tục các Executor",
+                title: document.getElementById('siteTitleInput').value.trim() || DEFAULT_TITLE,
+                subtitle: document.getElementById('siteSubtitleInput').value.trim() || DEFAULT_SUBTITLE,
                 items: itemsList,
                 trash: trashList
             };
