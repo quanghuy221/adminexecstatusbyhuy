@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" data-theme="cyber">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,22 +7,99 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --bg: #090d16;
-            --card-bg: rgba(19, 27, 46, 0.8);
-            --border: rgba(255, 255, 255, 0.08);
-            --accent: #8b5cf6;
-            --text-main: #f8fafc;
+        /* --- ĐỒNG BỘ BỘ THEMES ĐẸP NHƯ WEB CHÍNH --- */
+        html[data-theme="cyber"] {
+            --bg: #07090e;
+            --card-bg: rgba(14, 19, 31, 0.75);
+            --border: rgba(56, 189, 248, 0.2);
+            --accent: #38bdf8;
+            --accent-glow: rgba(56, 189, 248, 0.4);
+            --text-main: #f1f5f9;
             --text-sub: #94a3b8;
+            --modal-bg: rgba(15, 23, 42, 0.95);
         }
 
-        /* CHẶN BÔI ĐEN VÀ CHỌN PHẦN TỬ TOÀN TRANG */
+        html[data-theme="kyoto"] {
+            --bg: #0f0a13;
+            --card-bg: rgba(26, 17, 34, 0.75);
+            --border: rgba(244, 114, 182, 0.2);
+            --accent: #f472b6;
+            --accent-glow: rgba(244, 114, 182, 0.4);
+            --text-main: #fdf2f8;
+            --text-sub: #fbcfe8;
+            --modal-bg: rgba(24, 15, 31, 0.95);
+        }
+
+        html[data-theme="amoled"] {
+            --bg: #000000;
+            --card-bg: rgba(15, 15, 15, 0.85);
+            --border: rgba(16, 185, 129, 0.2);
+            --accent: #10b981;
+            --accent-glow: rgba(16, 185, 129, 0.4);
+            --text-main: #ffffff;
+            --text-sub: #a1a1aa;
+            --modal-bg: rgba(10, 10, 10, 0.95);
+        }
+
+        html[data-theme="sunset"] {
+            --bg: #120913;
+            --card-bg: rgba(30, 15, 30, 0.75);
+            --border: rgba(251, 146, 60, 0.2);
+            --accent: #fb923c;
+            --accent-glow: rgba(251, 146, 60, 0.4);
+            --text-main: #fff7ed;
+            --text-sub: #fdba74;
+            --modal-bg: rgba(26, 12, 26, 0.95);
+        }
+
+        html[data-theme="ocean"] {
+            --bg: #06111e;
+            --card-bg: rgba(11, 29, 51, 0.75);
+            --border: rgba(6, 182, 212, 0.2);
+            --accent: #06b6d4;
+            --accent-glow: rgba(6, 182, 212, 0.4);
+            --text-main: #ecfeff;
+            --text-sub: #a5f3fc;
+            --modal-bg: rgba(9, 23, 41, 0.95);
+        }
+
+        html[data-theme="dracula"] {
+            --bg: #0d0814;
+            --card-bg: rgba(23, 14, 36, 0.75);
+            --border: rgba(168, 85, 247, 0.22);
+            --accent: #a855f7;
+            --accent-glow: rgba(168, 85, 247, 0.4);
+            --text-main: #faf5ff;
+            --text-sub: #e9d5ff;
+            --modal-bg: rgba(20, 11, 31, 0.95);
+        }
+
+        html[data-theme="gold"] {
+            --bg: #0f0e0a;
+            --card-bg: rgba(28, 25, 17, 0.75);
+            --border: rgba(234, 179, 8, 0.22);
+            --accent: #eab308;
+            --accent-glow: rgba(234, 179, 8, 0.4);
+            --text-main: #fefce8;
+            --text-sub: #fef08a;
+            --modal-bg: rgba(23, 20, 13, 0.95);
+        }
+
+        html[data-theme="light"] {
+            --bg: #f3f5f9;
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --border: rgba(0, 0, 0, 0.08);
+            --accent: #2563eb;
+            --accent-glow: rgba(37, 99, 235, 0.25);
+            --text-main: #0f172a;
+            --text-sub: #475569;
+            --modal-bg: rgba(255, 255, 255, 0.95);
+        }
+
         * { 
             box-sizing: border-box; 
             user-select: none !important;
             -webkit-user-select: none !important;
-            -moz-user-select: none !important;
-            -ms-user-select: none !important;
         }
 
         body {
@@ -32,14 +109,11 @@
             font-family: 'Outfit', sans-serif;
             min-height: 100vh;
             padding: 30px 15px;
-            background-image: 
-                radial-gradient(circle at 15% 15%, rgba(139, 92, 246, 0.15) 0%, transparent 40%),
-                radial-gradient(circle at 85% 85%, rgba(6, 182, 212, 0.12) 0%, transparent 40%);
-            background-attachment: fixed;
+            transition: background 0.4s ease, color 0.4s ease;
             -webkit-font-smoothing: antialiased;
         }
 
-        .container { max-width: 1050px; margin: 0 auto; display: none; }
+        .container { max-width: 1080px; margin: 0 auto; display: none; }
 
         .top-bar {
             display: flex;
@@ -54,24 +128,27 @@
             font-size: 1.8rem;
             font-weight: 800;
             margin: 0;
-            background: linear-gradient(135deg, #a78bfa, #c084fc);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .card {
             background: var(--card-bg);
             border: 1px solid var(--border);
-            border-radius: 18px;
+            border-radius: 20px;
             padding: 22px;
             margin-bottom: 22px;
-            backdrop-filter: blur(12px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
         }
 
         .card h2 {
             font-size: 1.1rem;
-            color: #a78bfa;
+            color: var(--accent);
             margin: 0 0 18px 0;
             padding-bottom: 12px;
             border-bottom: 1px solid var(--border);
@@ -90,59 +167,63 @@
         .form-group { display: flex; flex-direction: column; gap: 6px; }
         .form-group.full-width { grid-column: 1 / -1; }
 
-        label { font-size: 0.82rem; color: var(--text-sub); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        label { font-size: 0.82rem; color: var(--text-sub); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
 
         input, select {
             padding: 11px 14px;
-            background: rgba(15, 23, 42, 0.8);
+            background: rgba(0, 0, 0, 0.25);
             border: 1px solid var(--border);
-            border-radius: 10px;
-            color: white;
+            border-radius: 12px;
+            color: var(--text-main);
             font-family: inherit;
             font-size: 0.9rem;
             outline: none;
-            transition: border-color 0.2s ease;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
             width: 100%;
-            user-select: text !important; /* Cho phép nhập dữ liệu trong ô input */
+            user-select: text !important;
             -webkit-user-select: text !important;
         }
 
-        input:focus, select:focus { border-color: var(--accent); }
+        input:focus, select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 12px var(--accent-glow);
+        }
 
         .btn {
             background: var(--accent);
-            color: white;
+            color: #ffffff;
             border: none;
             padding: 11px 18px;
-            border-radius: 10px;
-            font-weight: 600;
+            border-radius: 12px;
+            font-weight: 700;
             cursor: pointer;
             font-family: inherit;
             display: inline-flex;
             align-items: center;
             gap: 8px;
             font-size: 0.88rem;
+            box-shadow: 0 4px 15px var(--accent-glow);
             transition: transform 0.15s ease, opacity 0.15s ease;
-            will-change: transform;
         }
 
         .btn:hover { opacity: 0.92; transform: translateY(-2px); }
-        .btn-success { background: #10b981; }
-        .btn-warning { background: #f59e0b; color: #000; font-weight: 700; }
-        .btn-danger { background: #ef4444; }
+        .btn-success { background: #10b981; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); }
+        .btn-warning { background: #f59e0b; color: #000; font-weight: 800; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3); }
+        .btn-danger { background: #ef4444; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); }
+        .btn-theme { background: var(--card-bg); border: 1px solid var(--border); color: var(--text-main); }
 
         .table-wrap { overflow-x: auto; }
 
         table { width: 100%; border-collapse: collapse; min-width: 700px; }
-        th, td { padding: 12px 10px; text-align: left; border-bottom: 1px solid rgba(255, 255, 255, 0.04); font-size: 0.88rem; }
-        th { color: var(--text-sub); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        th, td { padding: 12px 10px; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.88rem; }
+        th { color: var(--text-sub); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 800; }
 
-        /* OVERLAY CẢNH BÁO BẢO MẬT (TỰ ĐỘNG HIỆN/ẨN KHI BẤM PHÍM HOẶC MỞ DEVTOOLS) */
+        /* OVERLAY CẢNH BÁO */
         #devtoolsBlocker {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
-            background: #090d16;
+            background: #07090e;
             color: #ef4444;
             z-index: 9999999;
             flex-direction: column;
@@ -157,8 +238,8 @@
         #loginOverlay {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(9, 13, 22, 0.95);
-            backdrop-filter: blur(15px);
+            background: rgba(7, 9, 14, 0.96);
+            backdrop-filter: blur(18px);
             z-index: 99999;
             display: flex;
             justify-content: center;
@@ -168,16 +249,16 @@
         .login-box {
             background: var(--card-bg);
             border: 1px solid var(--border);
-            border-radius: 20px;
+            border-radius: 24px;
             padding: 35px 30px;
             width: 90%;
             max-width: 380px;
             text-align: center;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.6), 0 0 30px var(--accent-glow);
         }
 
         .login-box i.main-icon { font-size: 3rem; color: var(--accent); margin-bottom: 15px; }
-        .login-box h2 { margin: 0 0 8px 0; font-size: 1.4rem; }
+        .login-box h2 { margin: 0 0 8px 0; font-size: 1.4rem; color: var(--text-main); }
         .login-box p { color: var(--text-sub); font-size: 0.88rem; margin-bottom: 20px; }
         .login-box input { margin-bottom: 16px; text-align: center; font-size: 1.1rem; letter-spacing: 3px; }
         .login-box button { width: 100%; justify-content: center; padding: 12px; font-size: 0.95rem; }
@@ -198,9 +279,9 @@
             align-items: center;
             gap: 10px;
             padding: 12px 18px;
-            border-radius: 12px;
+            border-radius: 14px;
             color: #fff;
-            font-weight: 600;
+            font-weight: 700;
             font-size: 0.88rem;
             box-shadow: 0 10px 25px rgba(0,0,0,0.5);
             backdrop-filter: blur(10px);
@@ -210,21 +291,106 @@
         }
 
         .toast.show { transform: translateX(0); }
-        .toast-success { background: rgba(16, 185, 129, 0.9); }
-        .toast-error { background: rgba(239, 68, 68, 0.9); }
-        .toast-info { background: rgba(139, 92, 246, 0.9); }
+        .toast-success { background: rgba(16, 185, 129, 0.92); }
+        .toast-error { background: rgba(239, 68, 68, 0.92); }
+        .toast-info { background: rgba(56, 189, 248, 0.92); }
         .toast-warning { background: rgba(245, 158, 11, 0.95); color: #000; }
+
+        /* POPUP MODAL THEMES CHO ADMIN */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            z-index: 999999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.show { opacity: 1; pointer-events: auto; }
+
+        .modal-container {
+            background: var(--modal-bg);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 26px;
+            width: 90%;
+            max-width: 540px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), 0 0 40px var(--accent-glow);
+            transform: scale(0.88) translateY(20px);
+            transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal-overlay.show .modal-container { transform: scale(1) translateY(0); }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+        }
+
+        .modal-header h3 {
+            margin: 0; font-size: 1.3rem; font-weight: 800; color: var(--text-main);
+            display: flex; align-items: center; gap: 10px;
+        }
+
+        .close-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            color: var(--text-sub);
+            width: 34px; height: 34px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.25s ease;
+        }
+
+        .close-btn:hover { color: var(--text-main); border-color: var(--accent); transform: rotate(90deg); }
+
+        .themes-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        @media (max-width: 480px) { .themes-grid { grid-template-columns: 1fr; } }
+
+        .theme-card {
+            background: var(--card-bg);
+            border: 1.5px solid var(--border);
+            border-radius: 14px;
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .theme-card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 8px 20px var(--accent-glow); }
+        .theme-card.active { border-color: var(--accent); background: rgba(255, 255, 255, 0.06); box-shadow: inset 0 0 12px var(--accent-glow); }
+
+        .dots-preview { display: flex; gap: 5px; align-items: center; }
+        .dots-preview span { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+        .theme-name { font-size: 0.9rem; font-weight: 700; color: var(--text-main); flex: 1; }
+        .check-icon { color: var(--accent); font-size: 0.9rem; opacity: 0; transform: scale(0.5); transition: all 0.25s ease; }
+        .theme-card.active .check-icon { opacity: 1; transform: scale(1); }
     </style>
 </head>
 <body>
 
-    <!-- MÀN HÌNH CẢNH BÁO KHI BẤM PHÍM TẮT BỊ CẤM / MỞ CONSOLE -->
+    <!-- MÀN HÌNH CẢNH BÁO KHI BẤM PHÍM CẤM / SOI CODE -->
     <div id="devtoolsBlocker">
         <i class="fas fa-triangle-exclamation" style="font-size: 4rem; margin-bottom: 20px;"></i>
-        <h1 style="font-size: 2.2rem; margin-bottom: 10px; color: #ef4444; background: none; -webkit-text-fill-color: initial;">CẢNH BÁO BẢO MẬT ADMIN</h1>
+        <h1 style="font-size: 2.2rem; margin-bottom: 10px; color: #ef4444;">CẢNH BÁO BẢO MẬT ADMIN</h1>
         <p style="color: #94a3b8; max-width: 550px; font-size: 1.05rem; line-height: 1.6; margin: 0;">
             Phát hiện thao tác phím tắt bị cấm (Ctrl+S, F12, Ctrl+U,...) hoặc DevTools!<br>
-            <span style="color: #a78bfa; font-weight: 600;">Nhả phím / Tắt DevTools để quay lại trang làm việc tự động.</span>
+            <span style="color: var(--accent); font-weight: 600;">Nhả phím / Tắt DevTools để quay lại trang làm việc tự động.</span>
         </p>
     </div>
 
@@ -244,8 +410,9 @@
     <!-- MAIN ADMIN CONTAINER -->
     <div class="container" id="adminContainer">
         <div class="top-bar">
-            <h1><i class="fas fa-user-gear"></i> Trang Quản Lý Admin</h1>
+            <h1><i class="fas fa-user-gear" style="color: var(--accent);"></i> Trang Quản Lý Admin</h1>
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="btn btn-theme" onclick="openThemeModal()"><i class="fas fa-palette"></i> Themes</button>
                 <button class="btn btn-warning" onclick="resetToDefault()"><i class="fas fa-rotate-left"></i> KHÔI PHỤC CÀI ĐẶT GỐC</button>
                 <button class="btn btn-danger" onclick="logoutAdmin()"><i class="fas fa-right-from-bracket"></i> Đăng Xuất</button>
             </div>
@@ -266,7 +433,7 @@
             </div>
         </div>
 
-        <!-- THÊM MỚI -->
+        <!-- THÊM MỚI EXECUTOR -->
         <div class="card">
             <h2><span><i class="fas fa-plus-circle"></i> Thêm Executor Mới</span></h2>
             <div class="form-grid">
@@ -308,7 +475,7 @@
             <button class="btn" onclick="addExecutor()"><i class="fas fa-plus"></i> Thêm Vào Bảng</button>
         </div>
 
-        <!-- BẢNG CHÍNH -->
+        <!-- BẢNG DỮ LIỆU HIỂN THỊ -->
         <div class="card">
             <div class="top-bar" style="margin-bottom: 10px;">
                 <h2 style="border:none; margin:0; padding:0;"><span><i class="fas fa-list"></i> Danh Sách Hiển Thị Trang Chủ</span></h2>
@@ -334,10 +501,125 @@
         </div>
     </div>
 
+    <!-- MODAL THEME CHO ADMIN -->
+    <div class="modal-overlay" id="themeModal" onclick="closeThemeModalOnOverlay(event)">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3><i class="fas fa-swatchbook" style="color: var(--accent);"></i> Chọn Theme Admin</h3>
+                <button class="close-btn" onclick="closeThemeModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="themes-grid">
+                <div class="theme-card" data-theme-id="cyber" onclick="selectTheme('cyber')">
+                    <div class="dots-preview">
+                        <span style="background: #07090e;"></span>
+                        <span style="background: #38bdf8;"></span>
+                        <span style="background: #ec4899;"></span>
+                    </div>
+                    <span class="theme-name">Cyber Neon</span>
+                    <i class="fas fa-check check-icon"></i>
+                </div>
+
+                <div class="theme-card" data-theme-id="kyoto" onclick="selectTheme('kyoto')">
+                    <div class="dots-preview">
+                        <span style="background: #0f0a13;"></span>
+                        <span style="background: #f472b6;"></span>
+                        <span style="background: #a855f7;"></span>
+                    </div>
+                    <span class="theme-name">Kyoto Night</span>
+                    <i class="fas fa-check check-icon"></i>
+                </div>
+
+                <div class="theme-card" data-theme-id="amoled" onclick="selectTheme('amoled')">
+                    <div class="dots-preview">
+                        <span style="background: #000000;"></span>
+                        <span style="background: #10b981;"></span>
+                        <span style="background: #06b6d4;"></span>
+                    </div>
+                    <span class="theme-name">Amoled Pulse</span>
+                    <i class="fas fa-check check-icon"></i>
+                </div>
+
+                <div class="theme-card" data-theme-id="sunset" onclick="selectTheme('sunset')">
+                    <div class="dots-preview">
+                        <span style="background: #120913;"></span>
+                        <span style="background: #fb923c;"></span>
+                        <span style="background: #f43f5e;"></span>
+                    </div>
+                    <span class="theme-name">Sunset Chill</span>
+                    <i class="fas fa-check check-icon"></i>
+                </div>
+
+                <div class="theme-card" data-theme-id="ocean" onclick="selectTheme('ocean')">
+                    <div class="dots-preview">
+                        <span style="background: #06111e;"></span>
+                        <span style="background: #06b6d4;"></span>
+                        <span style="background: #3b82f6;"></span>
+                    </div>
+                    <span class="theme-name">Deep Ocean</span>
+                    <i class="fas fa-check check-icon"></i>
+                </div>
+
+                <div class="theme-card" data-theme-id="dracula" onclick="selectTheme('dracula')">
+                    <div class="dots-preview">
+                        <span style="background: #0d0814;"></span>
+                        <span style="background: #a855f7;"></span>
+                        <span style="background: #d946ef;"></span>
+                    </div>
+                    <span class="theme-name">Dracula Violet</span>
+                    <i class="fas fa-check check-icon"></i>
+                </div>
+
+                <div class="theme-card" data-theme-id="gold" onclick="selectTheme('gold')">
+                    <div class="dots-preview">
+                        <span style="background: #0f0e0a;"></span>
+                        <span style="background: #eab308;"></span>
+                        <span style="background: #f97316;"></span>
+                    </div>
+                    <span class="theme-name">Luxury Gold</span>
+                    <i class="fas fa-check check-icon"></i>
+                </div>
+
+                <div class="theme-card" data-theme-id="light" onclick="selectTheme('light')">
+                    <div class="dots-preview">
+                        <span style="background: #ffffff; border: 1px solid #ccc;"></span>
+                        <span style="background: #2563eb;"></span>
+                        <span style="background: #9333ea;"></span>
+                    </div>
+                    <span class="theme-name">Nordic Light</span>
+                    <i class="fas fa-check check-icon"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // =========================================================
-        // BẢO MẬT: BẤM PHÍM CẤM -> HIỆN CẢNH BÁO, NHẢ PHÍM -> TỰ TẮT
-        // =========================================================
+        // QUẢN LÝ THEME LƯU LOCALSTORAGE CHO WEB ADMIN
+        function selectTheme(themeId) {
+            document.documentElement.setAttribute('data-theme', themeId);
+            localStorage.setItem('admin_preferred_theme', themeId);
+            updateActiveThemeUI(themeId);
+        }
+
+        function updateActiveThemeUI(themeId) {
+            document.querySelectorAll('.theme-card').forEach(card => {
+                if (card.getAttribute('data-theme-id') === themeId) {
+                    card.classList.add('active');
+                } else {
+                    card.classList.remove('active');
+                }
+            });
+        }
+
+        function openThemeModal() { document.getElementById('themeModal').classList.add('show'); }
+        function closeThemeModal() { document.getElementById('themeModal').classList.remove('show'); }
+        function closeThemeModalOnOverlay(e) { if (e.target.id === 'themeModal') closeThemeModal(); }
+
+        (function initAdminTheme() {
+            const saved = localStorage.getItem('admin_preferred_theme') || 'cyber';
+            selectTheme(saved);
+        })();
+
+        // BẢO MẬT: BẤM PHÍM CẤM / MỞ CONSOLE -> CẢNH BÁO
         const blocker = document.getElementById('devtoolsBlocker');
         let isKeyPressed = false;
         let isDevToolsOpen = false;
@@ -350,18 +632,14 @@
             }
         }
 
-        // Chặn chuột phải, bôi đen văn bản, kéo rê phần tử
         document.addEventListener('contextmenu', e => e.preventDefault());
         document.addEventListener('selectstart', e => {
             if (!['INPUT', 'TEXTAREA'].includes(e.target.tagName)) e.preventDefault();
         });
         document.addEventListener('dragstart', e => e.preventDefault());
 
-        // Bắt sự kiện BẤM PHÍM TẮT -> HIỆN CẢNH BÁO
         document.addEventListener('keydown', e => {
             const ctrlOrCmd = e.ctrlKey || e.metaKey;
-            
-            // Danh sách các phím tắt bị cấm: F12, Ctrl+S, Ctrl+U, Ctrl+P, Ctrl+Shift+I/J/C/K/S
             const isBlockedKey = 
                 e.key === 'F12' ||
                 (ctrlOrCmd && e.shiftKey && ['I', 'i', 'J', 'j', 'C', 'c', 'K', 'k', 'S', 's'].includes(e.key)) ||
@@ -376,19 +654,16 @@
             }
         });
 
-        // Bắt sự kiện NHẢ PHÍM -> TỰ TẮT CẢNH BÁO
         document.addEventListener('keyup', e => {
             isKeyPressed = false;
             updateBlockerState();
         });
 
-        // Tự tắt cảnh báo khi rời cửa sổ trình duyệt (để tránh bị kẹt màn hình)
         window.addEventListener('blur', () => {
             isKeyPressed = false;
             updateBlockerState();
         });
 
-        // Bẫy Debugger phát hiện khi MỞ DEVTOOLS / CONSOLE
         setInterval(() => {
             const startTime = performance.now();
             debugger;
@@ -402,9 +677,7 @@
             updateBlockerState();
         }, 200);
 
-        // =========================================================
-        // LOGIC TRANG ADMIN QUẢN LÝ DỮ LIỆU
-        // =========================================================
+        // LOGIC CHÍNH TRANG ADMIN
         const ADMIN_PASSWORD = "quanghuy90";
         const API_URL = "https://api.npoint.io/9d78b91f5a0f7c9f5ec8";
 
@@ -499,7 +772,7 @@
         function renderAdminTable() {
             const tbody = document.getElementById('adminTableBody');
             if (itemsList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color: var(--text-sub);">Chưa có mục nào. Hãy bấm "KHÔI PHỤC CÀI ĐẶT GỐC" hoặc thêm mới!</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color: var(--text-sub);">Chưa có mục nào. Bấm "KHÔI PHỤC CÀI ĐẶT GỐC" hoặc thêm mới!</td></tr>`;
                 return;
             }
 
